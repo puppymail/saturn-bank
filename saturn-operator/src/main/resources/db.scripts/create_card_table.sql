@@ -1,4 +1,4 @@
-CREATE TABLE Cards (
+CREATE TABLE Card (
     id bigint,
     account varchar(255),
     user_ varchar(255),
