@@ -6,6 +6,6 @@ CREATE TABLE transaction (
     state int,
     date_time date,
     PRIMARY KEY (transaction_id),
-    FOREIGN KEY (account_src) REFERENCES account(account_id),
-    FOREIGN KEY (account_dst) REFERENCES account(account_id)
+    FOREIGN KEY (account_src) REFERENCES account(id),
+    FOREIGN KEY (account_dst) REFERENCES account(id)
 );
