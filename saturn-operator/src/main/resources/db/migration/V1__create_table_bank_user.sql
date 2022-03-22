@@ -1,9 +1,12 @@
-CREATE TABLE bank_user(
-    user_id int UNIQUE NOT NULL,
-    full_name varchar(255),
-    phone_number varchar(255),
-    reg_info varchar(255),
-    role int,
-    type int,
-    PRIMARY KEY (user_id)
-);
+
+CREATE TABLE "bank_user"
+(
+    "id" BIGINT GENERATED ALWAYS AS IDENTITY,
+    "full_name" VARCHAR(255) NOT NULL,
+    "birth_date" DATE NOT NULL,
+    "registration_date" TIMESTAMP NOT NULL,
+    "phone_number" VARCHAR(50) NOT NULL,
+    "type" INT NOT NULL,
+    "role" INT NOT NULL,
+    CONSTRAINT pk_user PRIMARY KEY (id)
+)

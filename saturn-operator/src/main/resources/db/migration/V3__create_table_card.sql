@@ -4,6 +4,6 @@ CREATE TABLE card (
     percent numeric(8,5),
     type int,
     pincode int,
-    FOREIGN KEY (user_id) REFERENCES bank_user(user_id),
-    FOREIGN KEY (account_id) REFERENCES account(account_id)
+    FOREIGN KEY (user_id) REFERENCES bank_user(id),
+    FOREIGN KEY (account_id) REFERENCES account(id)
 );
