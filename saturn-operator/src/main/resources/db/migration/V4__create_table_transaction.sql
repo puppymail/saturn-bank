@@ -1,11 +1,11 @@
 CREATE TABLE transaction (
-    transaction_id int UNIQUE NOT NULL,
-    account_src int,
-    account_dst int,
+    id BIGINT GENERATED ALWAYS AS IDENTITY,
+    account_src BIGINT,
+    account_dst BIGINT,
     amount numeric(100,2),
     state int,
-    date_time date,
-    PRIMARY KEY (transaction_id),
+    date_time timestamp,
+    PRIMARY KEY (id),
     FOREIGN KEY (account_src) REFERENCES account(id),
     FOREIGN KEY (account_dst) REFERENCES account(id)
 );
