@@ -33,11 +33,21 @@ public class User {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "full_name", nullable = false)
-    private String fullName;
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @ToString.Exclude
+    @Column(name = "middle_name")
+    private String middleName;
+
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
 
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
+
+    @Column(name = "email", nullable = false)
+    private String email;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "user", orphanRemoval = true)
@@ -48,6 +58,9 @@ public class User {
 
     @Column(name = "registration_date", nullable = false)
     private LocalDateTime registrationDate;
+
+    @Column(name = "last_login", nullable = false)
+    private LocalDateTime lastLogin;
 
     @Enumerated
     @Column(name = "type", nullable = false)

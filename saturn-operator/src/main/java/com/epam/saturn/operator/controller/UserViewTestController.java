@@ -6,6 +6,7 @@ import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.UserRepository;
 
+import com.epam.saturn.operator.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,21 +22,21 @@ import java.util.function.Supplier;
 @RequestMapping("/users")
 public class UserViewTestController {
 
-    private final UserRepository userRepo;
+    private final UserService userService;
     private final AccountRepository accountRepo;
 
     private final Supplier<User> userSupplier;
 
     @Autowired
-    public UserViewTestController(UserRepository userRepo, AccountRepository accountRepo, Supplier<User> userSupplier) {
-        this.userRepo = userRepo;
+    public UserViewTestController(UserService userService, AccountRepository accountRepo, Supplier<User> userSupplier) {
+        this.userService = userService;
         this.accountRepo = accountRepo;
         this.userSupplier = userSupplier;
     }
 
     @GetMapping("/")
     public String testView(Model model) {
-        List<User> users = userRepo.findAll();
+        List<User> users = userService.findAll();
         model.addAttribute("users", users);
 
         log.info("displaying all users");
@@ -46,7 +47,7 @@ public class UserViewTestController {
     @GetMapping("/add-user")
     public String addTestUser() {
         User user = userSupplier.get();
-        userRepo.save(user);
+        userService.createUser(user);
 
         log.info("added new user: " + user);
 
@@ -57,13 +58,13 @@ public class UserViewTestController {
     public String addTestAccount() {
         Account account = new Account();
 
-        account.setUser(userRepo.findAll()
-                                .stream()
-                                .findAny()
-                                .orElseGet(() -> {
+        account.setUser(userService.findAll()
+                .stream()
+                .findAny()
+                .orElseGet(() -> {
             User user = userSupplier.get();
             log.info("couldn't find existing user, inserting new default user in \"bank_user\" table");
-            userRepo.save(user);
+            userService.createUser(user);
             return user;
         }));
 
@@ -76,7 +77,8 @@ public class UserViewTestController {
     @GetMapping("/clear-all")
     public String clearAll() {
         accountRepo.deleteAll();
-        userRepo.deleteAll();
+        userService.findAll()
+                .forEach(userService::deleteUser);
 
         log.info("cleared all records from \"bank_user\" and \"account\" tables");
 
