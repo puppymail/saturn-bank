@@ -1,6 +1,6 @@
 package com.epam.saturn.operator.service;
 
-import com.epam.saturn.operator.dao.CardEntityDao;
+import com.epam.saturn.operator.dao.Card;
 import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.dao.UserRole;
 import com.epam.saturn.operator.dao.UserType;
@@ -30,14 +30,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User deleteUser(User user) {
+    public void deleteUser(User user) {
         userRepository.delete(user);
-
-        return user;
     }
 
     @Override
-    public User editUser(User user) {
+    public void deleteUserById(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    public User editUser(User user, Long id) {
         throw new UnsupportedOperationException();
     }
 
@@ -47,7 +50,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean logIn(CardEntityDao card) {
+    public Boolean logIn(Card card) {
         throw new UnsupportedOperationException();
     }
 
@@ -58,47 +61,47 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findAll() {
-        throw new UnsupportedOperationException();
+        return userRepository.findAll();
     }
 
     @Override
     public Optional<User> findById(Long id) {
-        throw new UnsupportedOperationException();
+        return userRepository.findById(id);
     }
 
     @Override
     public List<User> findByFirstName(String firstName) {
-        throw new UnsupportedOperationException();
+        return userRepository.findByFirstName(firstName);
     }
 
     @Override
     public List<User> findByLastName(String lastName) {
-        throw new UnsupportedOperationException();
+        return userRepository.findByLastName(lastName);
     }
 
     @Override
     public List<User> findByBirthDate(LocalDate birthDate) {
-        throw new UnsupportedOperationException();
+        return userRepository.findByBirthDate(birthDate);
     }
 
     @Override
-    public List<User> findByType(UserType userType) {
-        throw new UnsupportedOperationException();
+    public List<User> findByType(UserType type) {
+        return userRepository.findByType(type);
     }
 
     @Override
-    public List<User> findByRole(UserRole userRole) {
-        throw new UnsupportedOperationException();
+    public List<User> findByRole(UserRole role) {
+        return userRepository.findByRole(role);
     }
 
     @Override
-    public Optional<User> findByPhoneNumber(String phoneNumber) {
-        throw new UnsupportedOperationException();
+    public List<User> findByPhoneNumber(String phoneNumber) {
+        return userRepository.findByPhoneNumber(phoneNumber);
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        throw new UnsupportedOperationException();
+    public List<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
 }

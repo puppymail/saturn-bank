@@ -12,6 +12,7 @@ CREATE TABLE "bank_user"
     "email" VARCHAR(255) NOT NULL,
     "type" INT NOT NULL,
     "role" INT NOT NULL,
+    "is_deleted" BOOLEAN NOT NULL,
     CONSTRAINT pk_user PRIMARY KEY (id)
 )
 

@@ -70,4 +70,7 @@ public class User {
     @Column(name = "role", nullable = false)
     private UserRole role;
 
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
 }

@@ -38,7 +38,7 @@ public class UserViewTestController {
         List<User> users = userService.findAll();
         model.addAttribute("users", users);
 
-        log.info("displaying all users");
+        log.info("Displaying all users");
 
         return "userViewTest/users";
     }
@@ -48,7 +48,7 @@ public class UserViewTestController {
         User user = userSupplier.get();
         userService.createUser(user);
 
-        log.info("added new user: " + user);
+        log.info("Added new user: " + user);
 
         return "redirect:/users/";
     }
@@ -62,13 +62,13 @@ public class UserViewTestController {
                 .findAny()
                 .orElseGet(() -> {
             User user = userSupplier.get();
-            log.info("couldn't find existing user, inserting new default user in \"bank_user\" table");
+            log.error("Couldn't find existing user, inserting new default user in \"bank_user\" table");
             userService.createUser(user);
             return user;
         }));
 
         accountRepo.save(account);
-        log.info("added new account: " + account + " to user: " + account.getUser());
+        log.info("Added new account: " + account + " to user: " + account.getUser());
 
         return "redirect:/users/";
     }
@@ -79,7 +79,7 @@ public class UserViewTestController {
         userService.findAll()
                 .forEach(userService::deleteUser);
 
-        log.info("cleared all records from \"bank_user\" and \"account\" tables");
+        log.info("Cleared all records from \"bank_user\" and \"account\" tables");
 
         return "redirect:/users/";
     }

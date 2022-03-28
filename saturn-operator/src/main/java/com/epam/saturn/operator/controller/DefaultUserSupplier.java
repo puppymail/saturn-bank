@@ -33,8 +33,12 @@ public class DefaultUserSupplier implements Supplier<User> {
         catch (IOException e) {
             e.printStackTrace();
         }
-        user.setFullName(userTestData.getProperty("fullName"));
+
+        user.setFirstName(userTestData.getProperty("firstName"));
+        user.setLastName(userTestData.getProperty("lastName"));
+        user.setMiddleName(userTestData.getProperty("middleName"));
         user.setPhoneNumber(userTestData.getProperty("phoneNumber"));
+        user.setEmail(userTestData.getProperty("email"));
         user.setBirthDate(LocalDate.parse(userTestData.getProperty("dateOfBirth")));
         user.setRegistrationDate(LocalDateTime.now());
         user.setType(UserType.valueOf(userTestData.getProperty("type")));

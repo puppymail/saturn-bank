@@ -1,6 +1,6 @@
 package com.epam.saturn.operator.service;
 
-import com.epam.saturn.operator.dao.CardEntityDao;
+import com.epam.saturn.operator.dao.Card;
 import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.dao.UserRole;
 import com.epam.saturn.operator.dao.UserType;
@@ -13,13 +13,15 @@ public interface UserService {
 
     public abstract User createUser(User user);
 
-    public abstract User deleteUser(User user);
+    public abstract void deleteUser(User user);
 
-    public abstract User editUser(User user);
+    public abstract void deleteUserById(Long id);
+
+    public abstract User editUser(User user, Long id);
 
     public abstract Boolean logIn(User user);
 
-    public abstract Boolean logIn(CardEntityDao card);
+    public abstract Boolean logIn(Card card);
 
     public abstract void logOut(User user);
 
@@ -33,12 +35,12 @@ public interface UserService {
 
     public abstract List<User> findByBirthDate(LocalDate birthDate);
 
-    public abstract List<User> findByType(UserType userType);
+    public abstract List<User> findByType(UserType type);
 
-    public abstract List<User> findByRole(UserRole userRole);
+    public abstract List<User> findByRole(UserRole role);
 
-    public abstract Optional<User> findByPhoneNumber(String phoneNumber);
+    public abstract List<User> findByPhoneNumber(String phoneNumber);
 
-    public abstract Optional<User> findByEmail(String email);
+    public abstract List<User> findByEmail(String email);
 
 }
