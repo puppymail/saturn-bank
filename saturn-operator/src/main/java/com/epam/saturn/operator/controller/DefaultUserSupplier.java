@@ -1,5 +1,8 @@
-package com.epam.saturn.operator.dao;
+package com.epam.saturn.operator.controller;
 
+import com.epam.saturn.operator.dao.User;
+import com.epam.saturn.operator.dao.UserRole;
+import com.epam.saturn.operator.dao.UserType;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -20,8 +23,11 @@ public class DefaultUserSupplier implements Supplier<User> {
     public User get() {
         User user = new User();
         Properties userTestData = new Properties();
-        try (InputStream propsFileStream = getClass().getClassLoader()
-                                                     .getResourceAsStream(DEFAULT_USER_DATA_PROPERTIES)) {
+        try (
+                InputStream propsFileStream = getClass()
+                        .getClassLoader()
+                        .getResourceAsStream(DEFAULT_USER_DATA_PROPERTIES)
+        ) {
             userTestData.load(propsFileStream);
         }
         catch (IOException e) {
