@@ -1,7 +1,6 @@
 package com.epam.saturn.operator.controller;
 
 import com.epam.saturn.operator.dao.Account;
-import com.epam.saturn.operator.dao.DefaultUserSupplier;
 import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.UserRepository;

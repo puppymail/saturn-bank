@@ -40,7 +40,7 @@ public class TransactionController {
 
     @GetMapping("/add")
     public String addTransaction() {
-        Account accountSrc = new Account();
+        Account accountSrc = new DefaultAccountSupplier().get();
         accountSrc.setAmount(ACCOUNT_SRC_AMOUNT);
         accountSrc.setUser(userRepo.findAll()
                 .stream()
@@ -51,7 +51,7 @@ public class TransactionController {
                     return user;
                 }));
         accountRepo.save(accountSrc);
-        Account accountDst = new Account();
+        Account accountDst = new DefaultAccountSupplier().get();
         accountDst.setAmount(ACCOUNT_DST_AMOUNT);
         accountDst.setUser(userRepo.findAll()
                 .stream()
