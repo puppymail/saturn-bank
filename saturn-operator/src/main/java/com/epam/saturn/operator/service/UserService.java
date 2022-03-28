@@ -8,6 +8,7 @@ import com.epam.saturn.operator.dao.UserType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public interface UserService {
 
@@ -15,9 +16,11 @@ public interface UserService {
 
     public abstract void deleteUser(User user);
 
-    public abstract void deleteUserById(Long id);
+    public abstract void deleteUser(Long id);
 
-    public abstract User editUser(User user, Long id);
+    public abstract void editUser(User newUser, Long id);
+
+    public abstract void editUser(User newUser, User oldUser);
 
     public abstract Boolean logIn(User user);
 
@@ -42,5 +45,7 @@ public interface UserService {
     public abstract List<User> findByPhoneNumber(String phoneNumber);
 
     public abstract List<User> findByEmail(String email);
+
+    public abstract List<User> findBy(String criterion, String value);
 
 }

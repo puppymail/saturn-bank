@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -53,6 +54,7 @@ public class User {
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Account> accountList = new ArrayList<>();
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 

@@ -41,6 +41,7 @@ public class DefaultUserSupplier implements Supplier<User> {
         user.setEmail(userTestData.getProperty("email"));
         user.setBirthDate(LocalDate.parse(userTestData.getProperty("dateOfBirth")));
         user.setRegistrationDate(LocalDateTime.now());
+        user.setLastLogin(user.getRegistrationDate());
         user.setType(UserType.valueOf(userTestData.getProperty("type")));
         user.setRole(UserRole.valueOf(userTestData.getProperty("role")));
 

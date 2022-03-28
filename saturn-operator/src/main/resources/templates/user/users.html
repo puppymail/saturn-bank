@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Users</title>
+        <link rel="stylesheet" th:href="@{/styles.css}"/>
+    </head>
+    <body>
+        <h4>Users:</h4>
+        <span>
+            <a th:href="@{/users/add-user}">ADD</a>
+        </span>
+        <div th:each="bankUser : ${bankUsers}" >
+            <span><b>ID</b>: </span>
+            <span th:text="${bankUser.getId()}">id</span>
+            <span> <b>Name</b>: </span>
+            <a th:href="@{/users/{id}(id=${bankUser.getId()})}">
+                <span th:text="${bankUser.getFirstName()}">first name</span>
+                <span th:text="${bankUser.getLastName()}">last name</span>
+            </a>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>User</title>
+        <link rel="stylesheet" th:href="@{/styles.css}"/>
+    </head>
+    <body>
+        <h4>User:</h4>
+        <div>
+            <table>
+                <tr>
+                    <th scope="col" style="text-align:right">ID</th>
+                    <td th:text="${bankUser.getId()}">ID</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">First name</th>
+                    <td th:text="${bankUser.getFirstName()}">First name</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">Middle name</th>
+                    <td th:text="${bankUser.getMiddleName()}">Middle name</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">Last name</th>
+                    <td th:text="${bankUser.getLastName()}">Last name</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">Birth date</th>
+                    <td th:text="${bankUser.getBirthDate()}">Birth date</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">Phone number</th>
+                    <td th:text="${bankUser.getPhoneNumber()}">Phone number</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">EMail</th>
+                    <td th:text="${bankUser.getEmail()}">Email</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">Type</th>
+                    <td th:text="${bankUser.getType()}">Type</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">Role</th>
+                    <td th:text="${bankUser.getRole()}">Role</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">Reg. Date</th>
+                    <td th:text="${bankUser.getRegistrationDate()}">Reg.Date</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">Last Login</th>
+                    <td th:text="${bankUser.getLastLogin()}">Last Login</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">Is Deleted</th>
+                    <td th:text="${bankUser.getIsDeleted()}">Is Deleted</td>
+                </tr>
+                <tr>
+                    <td scope="col" style="text-align:center">
+                        <a th:href="@{/users/{id}/edit(id=${bankUser.getId()})}">EDIT</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td scope="col" style="text-align:center">
+                        <a th:href="@{/users/{id}(id=${bankUser.getId()}, method=DELETE)}">DELETE</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td scope="col" style="text-align:center">
+                        <a th:href="@{/users}">BACK</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>
