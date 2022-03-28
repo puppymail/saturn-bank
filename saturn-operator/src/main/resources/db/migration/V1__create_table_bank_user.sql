@@ -14,3 +14,4 @@ CREATE TABLE "bank_user"
     "role" INT NOT NULL,
     CONSTRAINT pk_user PRIMARY KEY (id)
 )
+
