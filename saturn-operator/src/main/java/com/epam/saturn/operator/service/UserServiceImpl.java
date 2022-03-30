@@ -207,14 +207,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    // utility method, sets user as deleted
     private void setUserAsDeleted(User user) {
         user.setIsDeleted(true);
         userRepository.save(user);
         log.info("User with id " + user.getId() + " set as deleted.");
     }
 
-    // utility method, updates user
     private void updateUser(User updatedUser, User existingUser) {
         updatedUser.setId(existingUser.getId());
         userRepository.save(updatedUser);

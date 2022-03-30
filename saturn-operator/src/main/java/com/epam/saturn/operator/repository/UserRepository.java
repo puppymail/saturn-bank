@@ -13,18 +13,18 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    public abstract List<User> findByFirstName(String firstName);
+    List<User> findByFirstName(String firstName);
 
-    public abstract List<User> findByLastName(String lastName);
+    List<User> findByLastName(String lastName);
 
-    public abstract List<User> findByBirthDate(LocalDate birthDate);
+    List<User> findByBirthDate(LocalDate birthDate);
 
-    public abstract List<User> findByType(UserType type);
+    List<User> findByType(UserType type);
 
-    public abstract List<User> findByRole(UserRole role);
+    List<User> findByRole(UserRole role);
 
-    public abstract List<User> findByPhoneNumber(String phoneNumber);
+    List<User> findByPhoneNumber(String phoneNumber);
 
-    public abstract List<User> findByEmail(String email);
+    List<User> findByEmail(String email);
 
 }

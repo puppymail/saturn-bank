@@ -71,6 +71,7 @@ public class UserController {
         log.info("---------------------------------");
         User user = defaultUserSupplier.get();
         userService.createUser(user);
+        log.info("Redirecting to \"users\"");
 
         return "redirect:/users";
     }
@@ -80,6 +81,7 @@ public class UserController {
         log.info("Method \"showAddUser(Model)\" invoked");
         log.info("------------------------------");
         model.addAttribute("bankUser", new User());
+        log.info("Displaying \"add-user\" page.");
 
         return "user/addUser";
     }
@@ -89,6 +91,7 @@ public class UserController {
         log.info("Method \"addUser(User)\" invoked");
         log.info("------------------------------");
         userService.createUser(bankUser);
+        log.info("Redirecting to \"users\"");
 
         return "redirect:/users";
     }
@@ -110,6 +113,7 @@ public class UserController {
 
         accountRepo.save(account);
         log.info("Default account inserted in \"account\" table belonging to user id=" + account.getUser().getId());
+        log.info("Redirecting to \"users\"");
 
         return "redirect:/users";
     }
@@ -123,6 +127,7 @@ public class UserController {
         userService.findAll()
                 .forEach(userService::deleteUser);
         log.info("Cleared all records from \"bank_user\" table.");
+        log.info("Redirecting to \"users\"");
 
         return "redirect:/users";
     }
