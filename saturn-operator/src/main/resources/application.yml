@@ -14,3 +14,7 @@ spring:
     show-sql: false
   flyway:
     schemas: saturn_bank
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true

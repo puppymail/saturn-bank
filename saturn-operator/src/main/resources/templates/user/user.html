@@ -46,12 +46,16 @@
                     <td th:text="${bankUser.getRole()}">Role</td>
                 </tr>
                 <tr>
-                    <th scope="col" style="text-align:right">Reg. Date</th>
-                    <td th:text="${bankUser.getRegistrationDate()}">Reg.Date</td>
-                </tr>
-                <tr>
                     <th scope="col" style="text-align:right">Last Login</th>
                     <td th:text="${bankUser.getLastLogin()}">Last Login</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">Reg. Date</th>
+                    <td th:text="${bankUser.getRegistrationDate()}">Reg. Date</td>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:right">Last Mod.</th>
+                    <td th:text="${bankUser.getLastModified()}">Last Mod.</td>
                 </tr>
                 <tr>
                     <th scope="col" style="text-align:right">Is Deleted</th>
@@ -59,17 +63,23 @@
                 </tr>
                 <tr>
                     <td scope="col" style="text-align:center">
-                        <a th:href="@{/users/{id}/edit(id=${bankUser.getId()})}">EDIT</a>
+                        <form th:method="GET" th:action="@{/users/{id}/edit(id=${bankUser.getId()})}">
+                            <input type="submit" value="EDIT">
+                        </form>
                     </td>
                 </tr>
                 <tr>
                     <td scope="col" style="text-align:center">
-                        <a th:href="@{/users/{id}(id=${bankUser.getId()}, method=DELETE)}">DELETE</a>
+                        <form th:method="DELETE" th:action="@{/users/{id}(id=${bankUser.getId()})}">
+                            <input type="submit" value="DELETE">
+                        </form>
                     </td>
                 </tr>
                 <tr>
                     <td scope="col" style="text-align:center">
-                        <a th:href="@{/users}">BACK</a>
+                        <form th:method="GET" th:action="@{/users}">
+                            <input type="submit" value="BACK">
+                        </form>
                     </td>
                 </tr>
             </table>

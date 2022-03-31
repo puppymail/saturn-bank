@@ -29,6 +29,12 @@ public interface UserService {
 
     List<User> findAll();
 
+    List<User> findAll(Boolean isDeleted);
+
+    List<User> findAllByExample(User user);
+
+    Optional<User> findByExample(User user);
+
     Optional<User> findById(Long id);
 
     List<User> findByFirstName(String firstName);
@@ -45,6 +51,6 @@ public interface UserService {
 
     List<User> findByEmail(String email);
 
-    List<User> findBy(String criterion, String value);
+    List<User> findByCriterion(String criterion, String value);
 
 }

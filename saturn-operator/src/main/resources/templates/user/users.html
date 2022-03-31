@@ -15,8 +15,7 @@
             <span th:text="${bankUser.getId()}">id</span>
             <span> <b>Name</b>: </span>
             <a th:href="@{/users/{id}(id=${bankUser.getId()})}">
-                <span th:text="${bankUser.getFirstName()}">first name</span>
-                <span th:text="${bankUser.getLastName()}">last name</span>
+                <span th:text="|${bankUser.getFirstName()} ${bankUser.getLastName()}|">name</span>
             </a>
         </div>
     </body>

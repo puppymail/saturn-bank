@@ -3,6 +3,7 @@ package com.epam.saturn.operator.controller;
 import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.dao.UserRole;
 import com.epam.saturn.operator.dao.UserType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.function.Supplier;
 
+@Slf4j
 @Component
 public class DefaultUserSupplier implements Supplier<User> {
 
@@ -31,6 +33,7 @@ public class DefaultUserSupplier implements Supplier<User> {
             userTestData.load(propsFileStream);
         }
         catch (IOException e) {
+            log.error("!Couldn't load default user data!");
             e.printStackTrace();
         }
 

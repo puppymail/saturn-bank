@@ -1,9 +1,15 @@
 package com.epam.saturn.operator.dao;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.SQLDelete;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
@@ -24,10 +30,15 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
+@Builder
 @Entity
+@SQLDelete(sql = "UPDATE saturn_bank.bank_user SET is_deleted=TRUE, last_modified=DEFAULT WHERE id=?")
+@FilterDef(name = "deletedUserFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
+@Filter(name = "deletedUserFilter", condition = "deleted = :isDeleted")
 @Table(name = "bank_user")
-public class User {
+public class User implements SoftDeleteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,6 +75,9 @@ public class User {
     @Column(name = "last_login", nullable = false)
     private LocalDateTime lastLogin;
 
+    @Column(name = "last_modified", nullable = false)
+    private LocalDateTime lastModified;
+
     @Enumerated
     @Column(name = "type", nullable = false)
     private UserType type;
@@ -73,6 +87,6 @@ public class User {
     private UserRole role;
 
     @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
+    private Boolean isDeleted = Boolean.FALSE;
 
 }
