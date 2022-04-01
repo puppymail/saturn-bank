@@ -3,6 +3,7 @@ CREATE TABLE transaction (
     account_src BIGINT,
     account_dst BIGINT,
     amount numeric(100,2),
+    purpose varchar,
     state int,
     date_time timestamp,
     PRIMARY KEY (id),
