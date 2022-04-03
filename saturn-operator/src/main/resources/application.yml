@@ -11,6 +11,10 @@ spring:
         default_schema: saturn_bank
     hibernate:
       ddl-auto: validate
-    show-sql: true
+    show-sql: false
   flyway:
     schemas: saturn_bank
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true

@@ -3,6 +3,7 @@ package com.epam.saturn.operator.controller;
 import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.dao.UserRole;
 import com.epam.saturn.operator.dao.UserType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.function.Supplier;
 
+@Slf4j
 @Component
 public class DefaultUserSupplier implements Supplier<User> {
 
@@ -31,12 +33,18 @@ public class DefaultUserSupplier implements Supplier<User> {
             userTestData.load(propsFileStream);
         }
         catch (IOException e) {
+            log.error("!Couldn't load default user data!");
             e.printStackTrace();
         }
-        user.setFullName(userTestData.getProperty("fullName"));
+
+        user.setFirstName(userTestData.getProperty("firstName"));
+        user.setLastName(userTestData.getProperty("lastName"));
+        user.setMiddleName(userTestData.getProperty("middleName"));
         user.setPhoneNumber(userTestData.getProperty("phoneNumber"));
+        user.setEmail(userTestData.getProperty("email"));
         user.setBirthDate(LocalDate.parse(userTestData.getProperty("dateOfBirth")));
         user.setRegistrationDate(LocalDateTime.now());
+        user.setLastLogin(user.getRegistrationDate());
         user.setType(UserType.valueOf(userTestData.getProperty("type")));
         user.setRole(UserRole.valueOf(userTestData.getProperty("role")));
 

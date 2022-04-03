@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Add user</title>
+        <link rel="stylesheet" th:href="@{/styles.css}"/>
+    </head>
+    <body>
+        <h4>Add user</h4>
+        <form th:method="POST" th:action="@{/users}" th:object="${bankUser}">
+            <label for="firstName">Enter first name:</label>
+            <input type="text" th:field="*{firstName}" id="firstName" value="First name">
+            <br/>
+            <label for="firstName">Enter last name:</label>
+            <input type="text" th:field="*{lastName}" id="lastName" value="Last name">
+            <br/>
+            <label for="middleName">Enter middle name (not required):</label>
+            <input type="text" th:field="*{middleName}" id="middleName">
+            <br/>
+            <label for="birthDate">Enter date of birth:</label>
+            <input type="date" th:field="*{birthDate}" id="birthDate" value="2000-01-01">
+            <br/>
+            <label for="phoneNumber">Enter phone number:</label>
+            <input type="text" th:field="*{phoneNumber}" id="phoneNumber" value="+18000000000">
+            <br/>
+            <label for="email">Enter email:</label>
+            <input type="text" th:field="*{email}" id="email" value="example@mailservice.com">
+            <br/>
+<!--            TODO change radio buttons to drop-down lists and pull types/roles from db tables-->
+            <p>Select type:</p>
+            <div>
+                <label for="type_client"><b>CLIENT</b></label>
+                <input type="radio" th:field="*{type}" id="type_client" name="type" value="CLIENT" checked>
+                <label for="type_employee"><b>EMPLOYEE</b></label>
+                <input type="radio" th:field="*{type}" id="type_employee" name="type" value="EMPLOYEE">
+            </div>
+            <p>Select role:</p>
+            <div>
+                <label for="role_client"><b>CLIENT</b></label>
+                <input type="radio" th:field="*{role}" id="role_client" name="role" value="CLIENT" checked>
+                <label for="role_operator"><b>OPERATOR</b></label>
+                <input type="radio" th:field="*{role}" id="role_operator" name="role" value="OPERATOR">
+                <label for="role_admin"><b>ADMIN</b></label>
+                <input type="radio" th:field="*{role}" id="role_admin" name="role" value="ADMIN">
+                <label for="role_atm"><b>ATM</b></label>
+                <input type="radio" th:field="*{role}" id="role_atm" name="role" value="ATM">
+            </div>
+            <br/>
+            <p><input type="submit" value="Register new user"> <input type="reset" value="Reset"></p>
+
+        </form>
+    </body>
+</html>
