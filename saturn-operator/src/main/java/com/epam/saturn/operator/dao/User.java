@@ -6,9 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -35,8 +32,6 @@ import java.util.List;
 @Builder
 @Entity
 @SQLDelete(sql = "UPDATE saturn_bank.bank_user SET is_deleted=TRUE, last_modified=DEFAULT WHERE id=?")
-@FilterDef(name = "deletedUserFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
-@Filter(name = "deletedUserFilter", condition = "deleted = :isDeleted")
 @Table(name = "bank_user")
 public class User implements SoftDeleteEntity {
 
