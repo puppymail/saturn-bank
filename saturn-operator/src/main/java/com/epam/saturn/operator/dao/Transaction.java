@@ -39,6 +39,9 @@ public class Transaction {
     @Column
     private BigDecimal amount;
 
+    @Column
+    private String purpose;
+
     @DateTimeFormat
     private LocalDateTime dateTime;
 

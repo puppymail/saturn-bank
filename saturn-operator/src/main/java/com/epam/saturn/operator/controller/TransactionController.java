@@ -2,73 +2,35 @@ package com.epam.saturn.operator.controller;
 
 import com.epam.saturn.operator.dao.Account;
 import com.epam.saturn.operator.dao.Transaction;
-import com.epam.saturn.operator.dao.TransactionState;
-import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.TransactionRepository;
-import com.epam.saturn.operator.repository.UserRepository;
+import com.epam.saturn.operator.service.TransactionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Supplier;
 
 @Controller
 @RequestMapping("/transactions")
 public class TransactionController {
 
-    private static final BigDecimal ACCOUNT_SRC_AMOUNT = new BigDecimal(500);
-    private static final BigDecimal ACCOUNT_DST_AMOUNT = new BigDecimal(300);
-    private static final BigDecimal TRANSACTION_AMOUNT = new BigDecimal(200);
-
-    private final UserRepository userRepo;
     private final AccountRepository accountRepo;
     private final TransactionRepository transactionRepo;
-    private final Supplier<User> userSupplier;
+    private final TransactionServiceImpl transactionService;
 
     @Autowired
-    public TransactionController(AccountRepository accountRepo, TransactionRepository transactionRepo,
-                                 UserRepository userRepo, Supplier<User> userSupplier) {
+    public TransactionController(AccountRepository accountRepo, TransactionRepository transactionRepo, TransactionServiceImpl transactionService) {
         this.accountRepo = accountRepo;
         this.transactionRepo = transactionRepo;
-        this.userRepo = userRepo;
-        this.userSupplier = userSupplier;
+        this.transactionService = transactionService;
     }
 
-    @GetMapping("/add")
-    public String addTransaction() {
-        Account accountSrc = new DefaultAccountSupplier().get();
-        accountSrc.setAmount(ACCOUNT_SRC_AMOUNT);
-        accountSrc.setUser(userRepo.findAll()
-                .stream()
-                .findAny()
-                .orElseGet(() -> {
-                    User user = userSupplier.get();
-                    userRepo.save(user);
-                    return user;
-                }));
-        accountRepo.save(accountSrc);
-        Account accountDst = new DefaultAccountSupplier().get();
-        accountDst.setAmount(ACCOUNT_DST_AMOUNT);
-        accountDst.setUser(userRepo.findAll()
-                .stream()
-                .findAny()
-                .orElseGet(() -> {
-                    User user = userSupplier.get();
-                    userRepo.save(user);
-                    return user;
-                }));
-        accountRepo.save(accountDst);
-        Transaction transaction = new Transaction();
-        transaction.setSrc(accountSrc);
-        transaction.setDst(accountDst);
-        transaction.setAmount(TRANSACTION_AMOUNT);
-        transaction.setDateTime(LocalDateTime.now());
-        transaction.setState(TransactionState.DONE);
-        transactionRepo.save(transaction);
+    @GetMapping("/add-transaction-by-service&src-id={accountSrcId}&dst-id={accountDstId}&amount={amount}&purpose={purpose}")
+    public String addTransactionByService(@PathVariable long accountSrcId, @PathVariable long accountDstId, @PathVariable BigDecimal amount, @PathVariable String purpose) {
+        transactionService.transfer(accountSrcId, accountDstId, amount, purpose);
         return "redirect:/transactions/";
     }
 
