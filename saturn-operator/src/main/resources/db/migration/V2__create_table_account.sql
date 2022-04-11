@@ -13,3 +13,4 @@ CREATE TABLE account
     CONSTRAINT fk_account_user FOREIGN KEY (user_id) REFERENCES bank_user(id)
 )
 
+
