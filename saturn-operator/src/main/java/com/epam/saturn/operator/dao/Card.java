@@ -12,7 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
 import javax.persistence.FetchType;
-import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -25,7 +25,7 @@ public class Card {
     private Long id;
 
     @Column(name = "number")
-    private Long number;
+    private String number;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -35,14 +35,17 @@ public class Card {
     @JoinColumn(name = "account_id")
     private Account account;
 
-    @Column(name = "percent", precision = 20, scale = 2)
-    private BigDecimal percent;
+    @Column(name = "issue_date")
+    private LocalDate issueDate;
 
-    @Column(name = "type")
-    private Integer type;
+    @Column(name = "valid_till")
+    private LocalDate validTill;
 
     @Column(name = "pincode")
-    private Integer pinCode;
+    private String pinCode;
+
+    @Column(name = "cvv2")
+    private String cvv2;
 
 }
 
