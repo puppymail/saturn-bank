@@ -15,6 +15,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,6 +26,8 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @Table(name = "account")
+@SQLDelete(sql = "UPDATE saturn_bank.account SET is_deleted = true WHERE id=?")
+@Where(clause = "is_deleted = false")
 @Entity
 public class Account {
 
@@ -59,5 +63,8 @@ public class Account {
     @Enumerated
     @Column(columnDefinition = "smallint", name = "account_coin")
     private AccountCoin coin;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = Boolean.FALSE;
 
 }
