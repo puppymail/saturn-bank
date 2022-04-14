@@ -8,6 +8,7 @@ import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
@@ -27,6 +28,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResult transfer(long accountSrcId, long accountDstId, BigDecimal amount, String purpose) {
         Transaction transaction = new Transaction();
+        StringBuilder result = new StringBuilder();
         transaction.setState(TransactionState.NEW);
         Account accountSrc = null;
         Account accountDst = null;
@@ -34,25 +36,28 @@ public class TransactionServiceImpl implements TransactionService {
             accountSrc = accountRepo.findById(accountSrcId).orElseThrow();
         } catch (NoSuchElementException e) {
             transaction.setState(TransactionState.ERROR);
-            System.err.println("No such source account at DB"); //TODO
+            result.append("No such src account in DB, ");
         }
         try {
             accountDst = accountRepo.findById(accountDstId).orElseThrow();
         } catch (NoSuchElementException e) {
             transaction.setState(TransactionState.ERROR);
-            System.err.println("No such destination account at DB"); //TODO
+            result.append("No such dst account in DB, ");
         }
         if (accountSrc != null && accountDst != null) {
-            if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
                 transaction.setState(TransactionState.ERROR);
+                result.append("Amount can't be negative or zero, ");
             } else if (accountSrc.getAmount().compareTo(amount) < 0) {
                 transaction.setState(TransactionState.CANCELLED);
+                result.append("Src account doesn't have enough money for transfer, ");
             } else {
                 accountSrc.setAmount(accountSrc.getAmount().subtract(amount));
                 accountDst.setAmount(accountDst.getAmount().add(amount));
                 accountRepo.save(accountSrc);
                 accountRepo.save(accountDst);
                 transaction.setState(TransactionState.DONE);
+                result.append("Transaction completed successfully, ");
             }
         }
         transaction.setSrc(accountSrc);
@@ -61,6 +66,6 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setPurpose(purpose);
         transaction.setDateTime(LocalDateTime.now());
         transactionRepo.save(transaction);
-        return new TransactionResult(transaction.getId(), transaction.getState());
+        return new TransactionResult(transaction.getId(), transaction.getState(), result.substring(0, result.length() - 2));
     }
 }
