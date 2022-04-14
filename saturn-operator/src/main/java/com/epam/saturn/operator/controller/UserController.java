@@ -45,8 +45,6 @@ public class UserController {
 
     @GetMapping()
     public String showUsers(@RequestParam(name = "show", required = false) String show, Model model) {
-        log.info("Method \"users(Model)\" invoked");
-        log.info("-----------------------------");
         List<User> users;
         if (Objects.isNull(show)) {
             users = userService.findAll(Boolean.FALSE);
@@ -60,15 +58,12 @@ public class UserController {
             }
         }
         model.addAttribute("bankUsers", users);
-        log.info("Displaying users.");
 
         return "user/users";
     }
 
     @GetMapping("/{id}")
     public String showUser(@PathVariable("id") long id, Model model) {
-        log.info("Method \"showUser(int, Model)\" invoked");
-        log.info("---------------------------------");
         Optional<User> userOpt = userService.findById(id);
         if (userOpt.isEmpty()) {
             model.addAttribute("bankUser", new User());
@@ -83,8 +78,6 @@ public class UserController {
 
     @GetMapping("/{id}/delete")
     public String deleteUser(@PathVariable("id") long id, Model model) {
-        log.info("Method \"deleteUser(int, Model)\" invoked");
-        log.info("---------------------------------------");
         Optional<User> userOpt = userService.findById(id);
         if (userOpt.isEmpty()) {
             model.addAttribute("bankUser", new User());
@@ -99,8 +92,6 @@ public class UserController {
 
     @GetMapping("/{id}/edit")
     public String showEditUser(@PathVariable("id") long id, Model model) {
-        log.info("Method \"showEditUser(int, Model)\" invoked");
-        log.info("-----------------------------------------");
         Optional<User> userOpt = userService.findById(id);
         if (userOpt.isEmpty()) {
             log.error("!Redirecting to \"/users\"!");
@@ -115,8 +106,6 @@ public class UserController {
 
     @GetMapping("/add-default")
     public String addDefaultUser() {
-        log.info("Method \"addDefaultUser()\" invoked");
-        log.info("---------------------------------");
         User user = defaultUserSupplier.get();
         userService.createUser(user);
         log.info("Redirecting to \"/users\"");
@@ -126,8 +115,6 @@ public class UserController {
 
     @GetMapping("/add-user")
     public String showAddUser(Model model) {
-        log.info("Method \"showAddUser(Model)\" invoked");
-        log.info("------------------------------");
         model.addAttribute("bankUser", new User());
         log.info("Displaying \"add-user\" page.");
 
@@ -156,8 +143,6 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable("id") long id) {
-        log.info("Method \"deleteUser(long)\" invoked");
-        log.info("---------------------------------");
         userService.deleteUser(id);
         log.info("Redirecting to \"/users\"");
 
@@ -166,8 +151,6 @@ public class UserController {
 
     @GetMapping("/add-default-account")
     public String addDefaultAccount() {
-        log.info("Method \"addDefaultAccount()\" invoked");
-        log.info("------------------------------------");
         Account account = new Account();
         account.setUser(userService.findAll()
                 .stream()
@@ -188,8 +171,6 @@ public class UserController {
 
     @GetMapping("/clear-all")
     public String clearAll() {
-        log.info("Method \"clearAll()\" invoked");
-        log.info("---------------------------");
         accountRepo.deleteAll();
         log.info("Cleared all records from \"account\" table.");
         userService.findAll()

@@ -32,8 +32,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public User createUser(User user) {
-        log.info("Method \"createUser(User)\" invoked");
-        log.info("---------------------------------");
         if (user.getId() != null && userRepository.existsById(user.getId())) {
             log.error("!User with provided id=" + user.getId() + " already exists!");
             throw new IllegalArgumentException("User with provided id=" + user.getId() + " already exists");
@@ -46,7 +44,6 @@ public class UserServiceImpl implements UserService {
         user.setIsDeleted(false);
 
         userRepository.save(user);
-        log.info("New user saved.");
 
         return user;
     }
@@ -54,8 +51,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void deleteUser(User user) {
-        log.info("Method \"deleteUser(User)\" invoked");
-        log.info("---------------------------------");
         Optional<User> existingUser;
         if ( ( existingUser = userRepository.findOne(Example.of(user)) ).isEmpty() ) {
             log.error("!No such user found!");
@@ -68,8 +63,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void deleteUser(Long id) {
-        log.info("Method \"deleteUser(Long)\" invoked");
-        log.info("---------------------------------");
         Optional<User> existingUser;
         if ( ( existingUser = userRepository.findById(id) ).isEmpty() ) {
             log.error("!No user found with id=" + id + "!");
@@ -83,8 +76,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void editUser(User updatedUser, User existingUser) {
-        log.info("Method \"editUser(User, User)\" invoked");
-        log.info("-------------------------------------");
         if (Objects.isNull(updatedUser)) {
             log.error("!newUser provided is null!");
             throw new NullPointerException("newUser provided is null");
@@ -107,8 +98,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void editUser(User updatedUser, Long id) {
-        log.info("Method \"editUser(User, Long)\" invoked");
-        log.info("-------------------------------------");
         if (Objects.isNull(updatedUser)) {
             log.error("!newUser provided is null!");
             throw new NullPointerException("User provided is null");
@@ -145,18 +134,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findAll() {
-        log.info("Method \"findAll()\" invoked");
-        log.info("--------------------------");
-        List<User> users = userRepository.findAll();
-        log.info("Fetching list of all users.");
-
-        return users;
+        return userRepository.findAll();
     }
 
     @Override
-    public List<User> findAll(Boolean isDeleted) {
-        log.info("Method \"findAll(Boolean)\" invoked");
-        log.info("---------------------------------");
+    public List<User> findAll(Boolean isDeleted) { //TODO log refactor
         if (Objects.isNull(isDeleted)) {
             log.warn("Boolean provided is null, setting it to TRUE!");
             isDeleted = Boolean.TRUE;
@@ -173,92 +155,67 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findAllByExample(User user) {
-        log.info("Method \"findAllByExample(User)\" invoked");
-        log.info("---------------------------------------");
         if (Objects.isNull(user)) {
             log.warn("User provided is null, returning empty list!");
             return List.of();
         }
-        List<User> users = userRepository.findAll(Example.of(user));
-        log.info("Returning list of matching users.");
 
-        return users;
+        return userRepository.findAll(Example.of(user));
     }
 
     @Override
     public Optional<User> findByExample(User user) {
-        log.info("Method \"findByExample(User)\" invoked");
-        log.info("------------------------------------");
         if (Objects.isNull(user)) {
             log.warn("User provided is null, returning empty optional!");
             return Optional.empty();
         }
-        Optional<User> foundUser = userRepository.findOne(Example.of(user));
-        log.info("Returning optional of matching user.");
 
-        return foundUser;
+        return userRepository.findOne(Example.of(user));
     }
 
     @Override
     public Optional<User> findById(Long id) {
-        log.info("Method \"findById(Long)\" invoked");
 
         return userRepository.findById(id);
     }
 
     @Override
     public List<User> findByFirstName(String firstName) {
-        log.info("Method \"findByFirstName(String)\" invoked");
-
         return userRepository.findByFirstName(firstName);
     }
 
     @Override
     public List<User> findByLastName(String lastName) {
-        log.info("Method \"findByLastName(String)\" invoked");
-
         return userRepository.findByLastName(lastName);
     }
 
     @Override
     public List<User> findByBirthDate(LocalDate birthDate) {
-        log.info("Method \"findByBirthDate(LocalDate)\" invoked");
-
         return userRepository.findByBirthDate(birthDate);
     }
 
     @Override
     public List<User> findByType(UserType type) {
-        log.info("Method \"findByType(UserType)\" invoked");
-
         return userRepository.findByType(type);
     }
 
     @Override
     public List<User> findByRole(UserRole role) {
-        log.info("Method \"findByRole(UserRole)\" invoked");
-
         return userRepository.findByRole(role);
     }
 
     @Override
     public List<User> findByPhoneNumber(String phoneNumber) {
-        log.info("Method \"findByPhoneNumber(String)\" invoked");
-
         return userRepository.findByPhoneNumber(phoneNumber);
     }
 
     @Override
     public List<User> findByEmail(String email) {
-        log.info("Method \"findByEmail(String)\" invoked");
-
         return userRepository.findByEmail(email);
     }
 
     @Override
     public List<User> findByCriterion(String criterion, String value) {
-        log.info("Method \"findByCriterion(String, String)\" invoked");
-        log.info("------------------------------------------------");
         switch (criterion) {
             case "firstName":
                 log.info("Criterion is \"first name\".");
