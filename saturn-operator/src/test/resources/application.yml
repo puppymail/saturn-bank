@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: admin
+    password:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+        default_schema: saturn_bank
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  flyway:
+    schemas: saturn_bank
+  h2:
+    console.enabled: true
