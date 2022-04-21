@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Client's accounts</title>
+    <link rel="stylesheet" th:href="@{/styles.css}"/>
+    <style>
+    p {
+    border: 2px solid powderblue;
+    }
+    </style>
+</head>
+<body>
+<h4>Client's Accounts INFO </h4>
+<h4>Client general info: </h4>
+<p>
+<table>
+    <tr>
+        <th scope="col" style="text-align:right">ID</th>
+        <td th:text="${bankUser.getId()}">ID</td>
+    </tr>
+    <tr>
+        <th scope="col" style="text-align:right">First name</th>
+        <td th:text="${bankUser.getFirstName()}">First name</td>
+    </tr>
+    <tr>
+        <th scope="col" style="text-align:right">Last name</th>
+        <td th:text="${bankUser.getLastName()}">Last name</td>
+    </tr>
+        <th scope="col" style="text-align:right">Phone number</th>
+        <td th:text="${bankUser.getPhoneNumber()}">Phone number</td>
+    </tr>
+</table>
+<table>
+    <tr>
+        <td scope="col" style="text-align:center">
+            <form th:method="GET" th:action="@{/users/{id}/edit(id=${bankUser.getId()})}">
+                <input type="submit" value="EDIT CLIENT INFO">
+            </form>
+        </td>
+    </tr>
+    <tr>
+</table>
+</p>
+<table>
+    <td scope="col" style="text-align:left">
+        <form th:method="GET" th:action="@{/accounts/all-accounts-for{id}(id=${bankUser.getId()})}">
+            <input type="submit" value="SHOW ALL ACCOUNTS">
+        </form>
+    </td>
+    <td scope="col" style="text-align:left">
+        <form th:method="GET" th:action="@{/accounts/active-accounts-for{id}(id=${bankUser.getId()})}">
+            <input type="submit" value="SHOW ACTIVE ACCOUNTS">
+        </form>
+    </td>
+    <td scope="col" style="text-align:left">
+        <form th:method="GET" th:action="@{/accounts/add-account-for{id}(id=${bankUser.getId()})}">
+            <input type="submit" value="OPEN NEW ACCOUNT">
+        </form>
+    </td>
+    <tr>
+        <td scope="col" style="text-align:left">
+            <form th:method="GET" th:action="@{/users/{id}(id=${bankUser.getId()})}">
+                <input type="submit" value="BACK TO USER">
+            </form>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

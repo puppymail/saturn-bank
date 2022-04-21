@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>List of accounts</title>
+    <link rel="stylesheet" th:href="@{/styles.css}"/>
+</head>
+<body>
+<h4>Accounts</h4>
+<div th:each="account : ${accounts}">
+    <span><b>ID</b>: </span>
+    <a th:href="@{/accounts/all-accounts-for{id}/{idAcc}(id=${account.getUser.getId()}, idAcc=${account.getId})}">
+        <span th:text="${account.getId()}">id</span>
+    </a>
+
+    <span><b>CLIENT</b>: </span>
+    <span th:text="|${account.user.getFirstName()} ${account.user.getLastName()}|">name</span>
+    <span> <b>NUMBER</b>: </span>
+    <span th:text="${account.getNumber()}">number</span>
+    <span> <b>IS DEFAULT</b>: </span>
+    <span th:text="${account.isDefault()}">is_default</span>
+    <span> <b>IS DELETED</b>: </span>
+    <span th:text="${account.isDeleted()}">is_deleted</span>
+</div>
+<table>
+    <td scope="col" style="text-align:center">
+            <form th:method="GET" th:action="@{/accounts/accounts-for{id}(id=${bankUser.getId()})}">
+                <input type="submit" value="BACK TO USER ACCOUNTS">
+            </form>
+    </td>
+</table>
+</body>
+</html>

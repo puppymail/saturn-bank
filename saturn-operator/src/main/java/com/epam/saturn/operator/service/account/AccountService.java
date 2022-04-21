@@ -5,23 +5,31 @@ import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.dao.AccountType;
 import com.epam.saturn.operator.dao.AccountCoin;
 import com.epam.saturn.operator.dao.Transaction;
+import com.epam.saturn.operator.dto.AccountDto;
 import com.epam.saturn.operator.service.account.lists.AccountList;
 import com.epam.saturn.operator.service.account.transfers.MoneyTransfer;
 
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface AccountService {
 
-    Account openAccount(User user, AccountType type, AccountCoin coin, BigDecimal percent);
+    Account openAccount(AccountDto accountDto);
     void closeAccount(Account account);
+    void setAccountDefault(Long id);
+
     TransactionResult depositMoney(Account account, BigDecimal amount);
     TransactionResult withdrawMoney(Account account, BigDecimal amount);
     List<Transaction> getAccountTransactionHistory(Account account);
-    List<Account> getAccounts(User user);
 
-    default List<Account> getAccounts(String id, String idType) {
+    List<Account> getAllUserAccounts(User user);
+    List<Account> getActiveUserAccounts(User user);
+    Optional<Account> getAccount(Long id);
+    List<Account> findAll();
+
+    default List<Account> getAllAccounts(String id, String idType) {
         for (AccountList list : AccountList.values()) {
             if (list == AccountList.valueOf(idType)){
                 return list.execute(id);
