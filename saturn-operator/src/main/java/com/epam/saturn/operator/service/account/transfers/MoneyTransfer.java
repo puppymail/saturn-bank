@@ -16,7 +16,7 @@ public enum MoneyTransfer implements TransferCommand {
         this.command = command;
     }
     @Override
-    public TransactionResult execute(Account srcAccount, String dstAccount, BigDecimal amount) {
-        return command.execute(srcAccount, dstAccount, amount);
+    public TransactionResult execute(Account srcAccount, String dstAccount, BigDecimal amount, String purpose) {
+        return command.execute(srcAccount, dstAccount, amount, purpose);
     }
 }

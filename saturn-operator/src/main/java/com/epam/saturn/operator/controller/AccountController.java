@@ -3,6 +3,7 @@ package com.epam.saturn.operator.controller;
 import com.epam.saturn.operator.dao.Account;
 import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.dto.AccountDto;
+import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.service.UserService;
 import com.epam.saturn.operator.service.account.AccountService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +30,7 @@ public class AccountController {
 
     private final AccountService accountService;
     private final UserService userService;
+    private final AccountRepository accountRepository;
 
     private final String ATTRIBUTE_BANK_USER= "bankUser"; 
     private final String ATTRIBUTE_ACCOUNTS = "accounts";
@@ -46,9 +49,10 @@ public class AccountController {
 
 
     @Autowired
-    public AccountController(AccountService accountService, UserService userService) {
+    public AccountController(AccountService accountService, UserService userService, AccountRepository accountRepository) {
         this.accountService = accountService;
         this.userService = userService;
+        this.accountRepository = accountRepository;
     }
 
     @GetMapping("/")
@@ -147,6 +151,33 @@ public class AccountController {
         }
         accountService.openAccount(accountDto);
         return REDIRECT_ACTIVE_USER_ACCOUNTS + id;
+    }
+
+    @GetMapping("/transfer-by-card&src-number={srcNumber}&card={card}&amount={amount}")
+    public String transferByCard (@PathVariable String srcNumber, @PathVariable String card,
+                                  @PathVariable BigDecimal amount) {
+        Account accountSrc = accountRepository.findByNumber(Long.parseLong(srcNumber))
+                .orElseThrow(() -> new IllegalArgumentException("No source account with this number"));
+        accountService.transfer(accountSrc, card, amount, "For learning Spring", "BY_CARD");
+        return "redirect:/accounts/";
+    }
+
+    @GetMapping("/transfer-by-phone&src-number={srcNumber}&phone={phone}&amount={amount}")
+    public String transferByPhoneNumber (@PathVariable String srcNumber, @PathVariable String phone,
+                                         @PathVariable BigDecimal amount) {
+        Account accountSrc = accountRepository.findByNumber(Long.parseLong(srcNumber))
+                .orElseThrow(() -> new IllegalArgumentException("No source account with this number"));
+        accountService.transfer(accountSrc, phone, amount, "For learning Spring", "BY_PHONE");
+        return "redirect:/accounts/";
+    }
+
+    @GetMapping("/transfer-by-account-number&src-number={srcNumber}&dst-number={dstNumber}&amount={amount}")
+    public String transferByAccountNumber (@PathVariable String srcNumber, @PathVariable String dstNumber,
+                                           @PathVariable BigDecimal amount) {
+        Account accountSrc = accountRepository.findByNumber(Long.parseLong(srcNumber))
+                .orElseThrow(() -> new IllegalArgumentException("No source account with this number"));
+        accountService.transfer(accountSrc, dstNumber, amount, "For learning Spring", "BY_ACCOUNT");
+        return "redirect:/accounts/";
     }
 
     @ModelAttribute("accountDto")
