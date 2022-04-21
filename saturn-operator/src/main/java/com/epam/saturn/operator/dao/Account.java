@@ -12,21 +12,26 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Enumerated;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@Builder
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "account")
-@SQLDelete(sql = "UPDATE saturn_bank.account SET is_deleted = true WHERE id=?")
+@SQLDelete(sql = "UPDATE saturn_bank.account SET is_deleted = true, is_default = false WHERE id=?")
 @Where(clause = "is_deleted = false")
 @Entity
 public class Account {
@@ -37,10 +42,10 @@ public class Account {
     private Long id;
 
     @Column(name = "number", nullable = false)
-    private Long number;
+    private String number;
 
     @Column(name = "is_default")
-    private boolean isDefault;
+    private boolean isDefault = Boolean.FALSE;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Client account</title>
+    <link rel="stylesheet" th:href="@{/styles.css}"/>
+    <style>
+    p {
+    border: 2px solid powderblue;
+    }
+    </style>
+</head>
+<body>
+<h4>Client Account INFO</h4>
+<h4>Client general info: </h4>
+<p>
+<table>
+    <tr>
+        <th scope="col" style="text-align:right">ID</th>
+        <td th:text="${bankUser.getId()}">ID</td>
+    </tr>
+    <tr>
+        <th scope="col" style="text-align:right">First name</th>
+        <td th:text="${bankUser.getFirstName()}">First name</td>
+    </tr>
+    <tr>
+        <th scope="col" style="text-align:right">Last name</th>
+        <td th:text="${bankUser.getLastName()}">Last name</td>
+    </tr>
+    <th scope="col" style="text-align:right">Phone number</th>
+    <td th:text="${bankUser.getPhoneNumber()}">Phone number</td>
+    </tr>
+</table>
+<table>
+    <tr>
+        <td scope="col" style="text-align:center">
+            <form th:method="GET" th:action="@{/users/{id}/edit(id=${bankUser.getId()})}">
+                <input type="submit" value="EDIT CLIENT INFO">
+            </form>
+        </td>
+    </tr>
+    <tr>
+</table>
+</p>
+<h4>Account INFO: </h4>
+<p>
+<table th:if="${noAccount}">
+    </tr>
+    <th scope="col" style="text-align:right">Have not found account with ID</th>
+    <td th:text="${idAcc}">ID</td>
+    </tr>
+</table>
+<table th:unless="${noAccount}">
+    <tr>
+            <th scope="col" style="text-align:right">Coin</th>
+            <td th:text="${account.getCoin()}">Coin</td>
+        </tr>
+        <tr>
+            <th scope="col" style="text-align:right">Amount</th>
+            <td th:text="${account.getAmount()}">Amount</td>
+        </tr>
+    <tr>
+        <th scope="col" style="text-align:right">ID</th>
+        <td th:text="${account.getId()}">ID</td>
+    </tr>
+    <tr>
+        <th scope="col" style="text-align:right">Number</th>
+        <td th:text="${account.getNumber()}">Number</td>
+    </tr>
+    <tr>
+        <th scope="col" style="text-align:right">Is Default</th>
+        <td th:text="${account.isDefault()}">Is Default</td>
+    </tr>
+    <tr>
+        <th scope="col" style="text-align:right">Percent</th>
+        <td th:text="${account.getPercent()}">Percent</td>
+    </tr>
+    <tr>
+        <th scope="col" style="text-align:right">Type</th>
+        <td th:text="${account.getType()}">Type</td>
+    </tr>
+    <tr>
+        <th scope="col" style="text-align:right">Is Deleted</th>
+        <td th:text="${account.isDeleted()}">Is Deleted</td>
+    </tr>
+
+    <table>
+            <span th:if="${!account.isDeleted()}">
+                <table>
+                    <td scope="col" style="text-align:left">
+                        <form th:method="DELETE" th:action="@{/accounts/all-accounts-for{id}/{idAcc}(id=${bankUser.getId()}, idAcc=${account.getId()})}">
+                            <input type="submit" value="DELETE ACCOUNT">
+                        </form>
+                        </td>
+                    <span th:if="${!account.isDefault()}">
+                        <td scope="col" style="text-align:left">
+                            <form th:method="PUT" th:action="@{/accounts/all-accounts-for{id}/{idAcc}(id=${bankUser.getId()}, idAcc=${account.getId()})}">
+                                <input type="submit" value="SET DEFAULT">
+                            </form>
+                        </td>
+                    </span>
+                </table>
+            </span>
+    </table>
+</table>
+</p>
+
+<table>
+    <tr>
+        <td scope="col" style="text-align:left">
+            <form th:method="GET" th:action="@{/users/{id}(id=${bankUser.getId()})}">
+                <input type="submit" value="BACK TO USER">
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td scope="col" style="text-align:left">
+            <form th:method="GET" th:action="@{/accounts/active-accounts-for{id}(id=${bankUser.getId()})}">
+                <input type="submit" value="BACK TO USER ACTIVE ACCOUNTS">
+            </form>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

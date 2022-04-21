@@ -1,9 +1,12 @@
 package com.epam.saturn.operator.dao;
 
 public enum AccountCoin {
-
-    RUB("RUB"), EUR("EUR"), USD("USD");
-    private String currency;
-    AccountCoin(String currency) {}
+    RUB("RUB", "810"), EUR("EUR", "978"), USD("USD", "840");
+    public String currency;
+    public String code;
+    AccountCoin(String currency, String code) {
+        this.currency = currency;
+        this.code = code;
+    }
 
 }

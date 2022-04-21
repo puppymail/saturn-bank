@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Add account</title>
+    <link rel="stylesheet" th:href="@{/styles.css}"/>
+    <style>
+    p {
+    border: 2px solid powderblue;
+    }
+    </style>
+</head>
+<body>
+<h4>Add account for User: </h4>
+<p>
+<table>
+    <tr>
+        <th scope="col" style="text-align:right">ID</th>
+        <td th:text="${bankUser.getId()}">ID</td>
+    </tr>
+    <tr>
+        <th scope="col" style="text-align:right">First name</th>
+        <td th:text="${bankUser.getFirstName()}">First name</td>
+    </tr>
+    <tr>
+        <th scope="col" style="text-align:right">Last name</th>
+        <td th:text="${bankUser.getLastName()}">Last name</td>
+    </tr>
+    <th scope="col" style="text-align:right">Phone number</th>
+    <td th:text="${bankUser.getPhoneNumber()}">Phone number</td>
+    </tr>
+</table>
+</p>
+<p>
+<form th:method="POST" th:action="@{/accounts/add-account-for{id}(id=${bankUser.getId()})}" th:object="${accountDto}">
+    <div>Choose new account parameters:</div>
+    <input type="hidden" name="userId" th:value="${bankUser.getId()}"/>
+    <br>
+    <label><b>Set default:</b></label>
+    <input type="checkbox" th:field="*{isDefault}"/>
+    </br>
+    <br><b>Select type:</b></br>
+    <div>
+        <label for="account_type_regular">Regular account</label>
+        <input type="radio" th:field="*{type}" id="account_type_regular" name="account_type" value="REGULAR">
+        <label for="account_type_demand_deposits">Demand deposit account</label>
+        <input type="radio" th:field="*{type}" id="account_type_demand_deposits" name="account_type" value="DEMAND_DEPOSITS">
+    </div>
+    <br><b>Select coin:</b></br>
+    <div>
+        <label for="coin_rub">RUB</label>
+        <input type="radio" th:field="*{coin}" id="coin_rub" name="coin" value="RUB" th:required="required">
+        <label for="coin_eur">EUR</label>
+        <input type="radio" th:field="*{coin}" id="coin_eur" name="coin" value="EUR">
+        <label for="coin_usd">USD</label>
+        <input type="radio" th:field="*{coin}" id="coin_usd" name="coin" value="USD">
+    </div>
+    <br>
+    <label for="percent">Enter percent:</label>
+    <input type="number" th:field="*{percent}" id="percent">
+    </br>
+    <br>
+    <table>
+        <td>
+            <input type="submit" value="OPEN NEW ACCOUNT">
+        </td>
+    </table>
+    </br>
+</form>
+<p/>
+<table>
+    <td scope="col" style="text-align:left">
+        <form th:method="GET" th:action="@{/accounts/accounts-for{id}(id=${bankUser.getId()})}">
+            <input type="submit" value="BACK TO USER ACCOUNTS">
+        </form>
+    </td>
+</table>
+</body>
+</html>

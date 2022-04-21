@@ -27,7 +27,7 @@ public class DefaultAccountSupplier implements Supplier<Account> {
             e.printStackTrace();
         }
 
-        account.setNumber(Long.parseLong(accountTestData.getProperty("number")));
+        account.setNumber(accountTestData.getProperty("number"));
         account.setDefault(Boolean.parseBoolean(accountTestData.getProperty("isDefault")));
         account.setType(AccountType.valueOf(accountTestData.getProperty("type")));
         account.setPercent(new BigDecimal(accountTestData.getProperty("percent")));
