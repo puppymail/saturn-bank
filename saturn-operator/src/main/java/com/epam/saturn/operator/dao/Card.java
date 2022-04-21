@@ -2,6 +2,8 @@ package com.epam.saturn.operator.dao;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -17,6 +19,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Table(name = "card")
+@SQLDelete(sql = "UPDATE saturn_bank.card SET is_deleted = true WHERE id=?")
+@Where(clause = "is_deleted=false")
 @Entity
 public class Card {
 
@@ -46,6 +50,9 @@ public class Card {
 
     @Column(name = "cvv2")
     private String cvv2;
+
+    @Column(name = "is_deleted")
+    private boolean isDeleted = Boolean.FALSE;
 
 }
 
