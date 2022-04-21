@@ -6,5 +6,5 @@ import com.epam.saturn.operator.service.account.TransactionResult;
 import java.math.BigDecimal;
 
 interface TransferCommand {
-    TransactionResult execute(Account srcAccount, String dstAccount, BigDecimal amount);
+    TransactionResult execute(Account srcAccount, String dstAccount, BigDecimal amount, String purpose);
 }

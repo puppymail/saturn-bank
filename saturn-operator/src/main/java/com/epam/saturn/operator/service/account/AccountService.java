@@ -38,10 +38,10 @@ public interface AccountService {
         throw new IllegalArgumentException("identifier type isn't present in the enum");
     }
 
-    default TransactionResult transfer(Account srcAccount, String dstAccount, BigDecimal amount, String idType) {
+    default TransactionResult transfer(Account srcAccount, String dstAccount, BigDecimal amount, String purpose, String idType) {
         for (MoneyTransfer type : MoneyTransfer.values()) {
             if (type == MoneyTransfer.valueOf(idType)){
-                return type.execute(srcAccount, dstAccount, amount);
+                return type.execute(srcAccount, dstAccount, amount, purpose);
             }
         }
         throw new IllegalArgumentException("transfer type isn't present in the enum");

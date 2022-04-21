@@ -4,7 +4,7 @@ import com.epam.saturn.operator.dao.Account;
 import com.epam.saturn.operator.dao.Transaction;
 import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.TransactionRepository;
-import com.epam.saturn.operator.service.TransactionServiceImpl;
+import com.epam.saturn.operator.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +20,10 @@ public class TransactionController {
 
     private final AccountRepository accountRepo;
     private final TransactionRepository transactionRepo;
-    private final TransactionServiceImpl transactionService;
+    private final TransactionService transactionService;
 
     @Autowired
-    public TransactionController(AccountRepository accountRepo, TransactionRepository transactionRepo, TransactionServiceImpl transactionService) {
+    public TransactionController(AccountRepository accountRepo, TransactionRepository transactionRepo, TransactionService transactionService) {
         this.accountRepo = accountRepo;
         this.transactionRepo = transactionRepo;
         this.transactionService = transactionService;
