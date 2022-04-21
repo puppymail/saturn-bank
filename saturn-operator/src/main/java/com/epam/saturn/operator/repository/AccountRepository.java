@@ -14,8 +14,12 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account,Long> {
     List<Account> findByUser(User user);
 
-    @Query(value = "SELECT * FROM saturn_bank.account", nativeQuery = true)
-    List<Account> findAllAccounts(User user);
+    @Query(value = "SELECT * FROM saturn_bank.account WHERE saturn_bank.account.user_id = :userId", nativeQuery = true)
+    List<Account> findAllAccounts(Long userId);
+
+    default List<Account> findAllAccounts(User user) {
+        return findAllAccounts(user.getId());
+    }
 
     @Query("SELECT a FROM Account a WHERE a.number = :number AND a.isDeleted = false")
     Optional<Account> findByNumber(@Param("number") Long number);
