@@ -34,7 +34,7 @@ import java.util.List;
 @SQLDelete(sql = "UPDATE saturn_bank.account SET is_deleted = true, is_default = false WHERE id=?")
 @Where(clause = "is_deleted = false")
 @Entity
-public class Account {
+public class Account implements SoftDeleteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

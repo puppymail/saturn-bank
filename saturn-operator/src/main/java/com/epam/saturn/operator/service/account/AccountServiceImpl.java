@@ -8,7 +8,7 @@ import com.epam.saturn.operator.dao.Transaction;
 import com.epam.saturn.operator.dto.AccountDto;
 import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.UserRepository;
-import com.epam.saturn.operator.service.UserService;
+import com.epam.saturn.operator.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;

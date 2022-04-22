@@ -17,9 +17,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.OneToMany;
 import javax.persistence.Enumerated;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.PastOrPresent;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,23 +50,21 @@ public class User implements SoftDeleteEntity {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
 
-    @Email
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Builder.Default
     @ToString.Exclude
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Account> accountList = new ArrayList<>();
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Past
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
-    @PastOrPresent
     @Column(name = "registration_date", nullable = false)
     private LocalDateTime registrationDate;
 
@@ -87,7 +82,8 @@ public class User implements SoftDeleteEntity {
     @Column(name = "role", nullable = false)
     private UserRole role;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = Boolean.FALSE;
+    private boolean isDeleted = Boolean.FALSE;
 
 }

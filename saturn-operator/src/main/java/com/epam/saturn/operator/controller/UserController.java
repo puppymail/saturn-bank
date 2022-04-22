@@ -1,10 +1,15 @@
 package com.epam.saturn.operator.controller;
 
+import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toList;
+
 import com.epam.saturn.operator.dao.Account;
 import com.epam.saturn.operator.dao.User;
+import com.epam.saturn.operator.dto.UserDto;
+import com.epam.saturn.operator.dto.UserMapper;
 import com.epam.saturn.operator.repository.AccountRepository;
 
-import com.epam.saturn.operator.service.UserService;
+import com.epam.saturn.operator.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,7 +17,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -33,20 +36,23 @@ public class UserController {
     private final AccountRepository accountRepo;
 
     private final Supplier<User> defaultUserSupplier;
+    private final UserMapper mapper;
 
     @Autowired
     public UserController(UserService userService,
                           AccountRepository accountRepo,
-                          Supplier<User> defaultUserSupplier) {
+                          Supplier<User> defaultUserSupplier,
+                          UserMapper mapper) {
         this.userService = userService;
         this.accountRepo = accountRepo;
         this.defaultUserSupplier = defaultUserSupplier;
+        this.mapper = mapper;
     }
 
     @GetMapping()
     public String showUsers(@RequestParam(name = "show", required = false) String show, Model model) {
         List<User> users;
-        if (Objects.isNull(show)) {
+        if (isNull(show)) {
             users = userService.findAll(Boolean.FALSE);
         } else {
             if (show.equals("all")) {
@@ -57,7 +63,10 @@ public class UserController {
                 users = userService.findAll(Boolean.FALSE);
             }
         }
-        model.addAttribute("bankUsers", users);
+        List<UserDto> usersDto = users.stream()
+                        .map(mapper::userToDto)
+                        .collect(toList());
+        model.addAttribute("bankUsers", usersDto);
 
         return "user/users";
     }
@@ -66,10 +75,10 @@ public class UserController {
     public String showUser(@PathVariable("id") long id, Model model) {
         Optional<User> userOpt = userService.findById(id);
         if (userOpt.isEmpty()) {
-            model.addAttribute("bankUser", new User());
+            model.addAttribute("bankUser", new UserDto());
             log.error("!Added empty user to the model!");
         } else {
-            model.addAttribute("bankUser", userOpt.get());
+            model.addAttribute("bankUser", mapper.userToDto(userOpt.get()));
             log.info("Added user to model.");
         }
 
@@ -80,10 +89,10 @@ public class UserController {
     public String deleteUser(@PathVariable("id") long id, Model model) {
         Optional<User> userOpt = userService.findById(id);
         if (userOpt.isEmpty()) {
-            model.addAttribute("bankUser", new User());
+            model.addAttribute("bankUser", new UserDto());
             log.error("!Added empty user to the model!");
         } else {
-            model.addAttribute("bankUser", userOpt.get());
+            model.addAttribute("bankUser", mapper.userToDto(userOpt.get()));
             log.info("Added user to model.");
         }
 
@@ -97,7 +106,7 @@ public class UserController {
             log.error("!Redirecting to \"/users\"!");
             return "redirect:/users";
         } else {
-            model.addAttribute("bankUser", userOpt.get());
+            model.addAttribute("bankUser", mapper.userToDto(userOpt.get()));
             log.info("Added user to model.");
         }
 
@@ -115,27 +124,23 @@ public class UserController {
 
     @GetMapping("/add-user")
     public String showAddUser(Model model) {
-        model.addAttribute("bankUser", new User());
+        model.addAttribute("bankUser", new UserDto());
         log.info("Displaying \"add-user\" page.");
 
         return "user/addUser";
     }
 
     @PostMapping()
-    public String addUser(@ModelAttribute("bankUser") User bankUser) {
-        log.info("Method \"addUser(User)\" invoked");
-        log.info("------------------------------");
-        userService.createUser(bankUser);
+    public String addUser(@ModelAttribute("bankUser") UserDto bankUserDto) {
+        userService.createUser(mapper.dtoToUser(bankUserDto));
         log.info("Redirecting to \"/users\"");
 
         return "redirect:/users";
     }
 
     @PutMapping("/{id}")
-    public String editUser(@PathVariable("id") long id, @ModelAttribute("bankUser") User bankUser) {
-        log.info("Method \"editUser(long, User)\" invoked");
-        log.info("------------------------------");
-        userService.editUser(bankUser, id);
+    public String editUser(@PathVariable("id") long id, @ModelAttribute("bankUser") UserDto bankUserDto) {
+        userService.editUser(mapper.dtoToUser(bankUserDto), id);
         log.info("Redirecting to \"/users/" + id + "\"");
 
         return "redirect:/users/" + id;

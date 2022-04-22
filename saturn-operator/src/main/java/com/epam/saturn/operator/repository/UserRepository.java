@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, SoftDeleteEntityRepository<User, Long> {
@@ -23,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long>, SoftDeleteEnt
 
     List<User> findByRole(UserRole role);
 
-    List<User> findByPhoneNumber(String phoneNumber);
+    Optional<User> findByPhoneNumber(String phoneNumber);
 
     List<User> findByEmail(String email);
 
