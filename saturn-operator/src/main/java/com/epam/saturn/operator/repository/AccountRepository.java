@@ -18,5 +18,5 @@ public interface AccountRepository extends JpaRepository<Account,Long> {
     List<Account> findAllAccounts(User user);
 
     @Query("SELECT a FROM Account a WHERE a.number = :number AND a.isDeleted = false")
-    Optional<Account> findByNumber(@Param("number") Long number);
+    Optional<Account> findByNumber(@Param("number") String number);
 }

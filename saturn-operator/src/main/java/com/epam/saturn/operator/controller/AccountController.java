@@ -156,7 +156,7 @@ public class AccountController {
     @GetMapping("/transfer-by-card&src-number={srcNumber}&card={card}&amount={amount}")
     public String transferByCard (@PathVariable String srcNumber, @PathVariable String card,
                                   @PathVariable BigDecimal amount) {
-        Account accountSrc = accountRepository.findByNumber(Long.parseLong(srcNumber))
+        Account accountSrc = accountRepository.findByNumber(srcNumber)
                 .orElseThrow(() -> new IllegalArgumentException("No source account with this number"));
         accountService.transfer(accountSrc, card, amount, "For learning Spring", "BY_CARD");
         return "redirect:/accounts/";
@@ -165,7 +165,7 @@ public class AccountController {
     @GetMapping("/transfer-by-phone&src-number={srcNumber}&phone={phone}&amount={amount}")
     public String transferByPhoneNumber (@PathVariable String srcNumber, @PathVariable String phone,
                                          @PathVariable BigDecimal amount) {
-        Account accountSrc = accountRepository.findByNumber(Long.parseLong(srcNumber))
+        Account accountSrc = accountRepository.findByNumber(srcNumber)
                 .orElseThrow(() -> new IllegalArgumentException("No source account with this number"));
         accountService.transfer(accountSrc, phone, amount, "For learning Spring", "BY_PHONE");
         return "redirect:/accounts/";
@@ -174,7 +174,7 @@ public class AccountController {
     @GetMapping("/transfer-by-account-number&src-number={srcNumber}&dst-number={dstNumber}&amount={amount}")
     public String transferByAccountNumber (@PathVariable String srcNumber, @PathVariable String dstNumber,
                                            @PathVariable BigDecimal amount) {
-        Account accountSrc = accountRepository.findByNumber(Long.parseLong(srcNumber))
+        Account accountSrc = accountRepository.findByNumber(srcNumber)
                 .orElseThrow(() -> new IllegalArgumentException("No source account with this number"));
         accountService.transfer(accountSrc, dstNumber, amount, "For learning Spring", "BY_ACCOUNT");
         return "redirect:/accounts/";

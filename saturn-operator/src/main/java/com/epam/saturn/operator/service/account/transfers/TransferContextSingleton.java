@@ -99,7 +99,7 @@ public enum TransferContextSingleton {
         if (Validator.validate(accountNumberRegexp, account)) {
             StringBuilder log = new StringBuilder();
             try {
-                long dstId = accountRepository.findByNumber(Long.parseLong(account))
+                long dstId = accountRepository.findByNumber(account)
                         .orElseThrow(() -> new IllegalArgumentException("No such destination account"))
                         .getId();
                 transactionService.transfer(srcAccount.getId(), dstId, amount, purpose);
