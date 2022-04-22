@@ -10,7 +10,7 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         default_schema: saturn_bank
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     show-sql: false
   flyway:
     schemas: saturn_bank

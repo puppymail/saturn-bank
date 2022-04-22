@@ -22,7 +22,7 @@ import java.time.LocalDate;
 @SQLDelete(sql = "UPDATE saturn_bank.card SET is_deleted = true WHERE id=?")
 @Where(clause = "is_deleted=false")
 @Entity
-public class Card {
+public class Card implements SoftDeleteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,4 +1,4 @@
-package com.epam.saturn.operator.service;
+package com.epam.saturn.operator.service.user;
 
 import com.epam.saturn.operator.dao.Card;
 import com.epam.saturn.operator.dao.User;
@@ -47,10 +47,8 @@ public interface UserService {
 
     List<User> findByRole(UserRole role);
 
-    List<User> findByPhoneNumber(String phoneNumber);
+    Optional<User> findByPhoneNumber(String phoneNumber);
 
     List<User> findByEmail(String email);
-
-    List<User> findByCriterion(String criterion, String value);
 
 }

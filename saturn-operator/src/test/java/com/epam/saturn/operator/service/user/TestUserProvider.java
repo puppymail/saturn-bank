@@ -1,11 +1,12 @@
-package com.epam.saturn.operator.service;
+package com.epam.saturn.operator.service.user;
+
+import static java.time.LocalDateTime.now;
 
 import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.dao.UserRole;
 import com.epam.saturn.operator.dao.UserType;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.Column;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.util.Properties;
 public class TestUserProvider {
 
     private final static String TEST_USER_DATA_PROPERTIES = "testUserData.properties";
+    private final static String DEFAULT_PASSWORD = "admin";
     private final int USERS_SIZE;
 
     Properties userTestData;
@@ -42,23 +44,22 @@ public class TestUserProvider {
 
     public User get(int testUserId) {
         if (testUserId < 0 || testUserId >= USERS_SIZE) throw new IllegalArgumentException();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = now();
 
-        User user = new User();
-        user.setId(testUserId + 1L);
-        user.setFirstName(userTestData.getProperty("firstName" + testUserId));
-        user.setLastName(userTestData.getProperty("lastName" + testUserId));
-        user.setMiddleName(userTestData.getProperty("middleName" + testUserId));
-        user.setPhoneNumber(userTestData.getProperty("phoneNumber" + testUserId));
-        user.setEmail(userTestData.getProperty("email" + testUserId));
-        user.setBirthDate(LocalDate.parse(userTestData.getProperty("dateOfBirth" + testUserId)));
-        user.setRegistrationDate(now);
-        user.setLastModified(now);
-        user.setLastLogin(now);
-        user.setType(UserType.valueOf(userTestData.getProperty("type" + testUserId)));
-        user.setRole(UserRole.valueOf(userTestData.getProperty("role" + testUserId)));
-
-        return user;
+        return User.builder()
+                .id(testUserId + 1L)
+                .firstName(userTestData.getProperty(testUserId + ".firstName"))
+                .lastName(userTestData.getProperty(testUserId + ".lastName"))
+                .middleName(userTestData.getProperty(testUserId + ".middleName"))
+                .phoneNumber(userTestData.getProperty(testUserId + ".phoneNumber"))
+                .email(userTestData.getProperty(testUserId + ".email"))
+                .birthDate(LocalDate.parse(userTestData.getProperty(testUserId + ".dateOfBirth")))
+                .registrationDate(now)
+                .lastModified(now)
+                .lastLogin(now)
+                .type(UserType.valueOf(userTestData.getProperty(testUserId + ".type")))
+                .role(UserRole.valueOf(userTestData.getProperty(testUserId + ".role")))
+                .build();
     }
 
 }
