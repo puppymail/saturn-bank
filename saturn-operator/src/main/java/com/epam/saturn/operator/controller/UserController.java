@@ -17,13 +17,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -37,15 +40,19 @@ public class UserController {
 
     private final Supplier<User> defaultUserSupplier;
     private final UserMapper mapper;
+    private final RandomUserGenerator randomUserGenerator;
 
     @Autowired
     public UserController(UserService userService,
                           AccountRepository accountRepo,
                           Supplier<User> defaultUserSupplier,
-                          UserMapper mapper) {
+                          UserMapper mapper,
+                          RandomUserGenerator randomUserGenerator) {
+
         this.userService = userService;
         this.accountRepo = accountRepo;
         this.defaultUserSupplier = defaultUserSupplier;
+        this.randomUserGenerator = randomUserGenerator;
         this.mapper = mapper;
     }
 
@@ -116,6 +123,26 @@ public class UserController {
     @GetMapping("/add-default")
     public String addDefaultUser() {
         User user = defaultUserSupplier.get();
+        userService.createUser(user);
+        log.info("Redirecting to \"/users\"");
+
+        return "redirect:/users";
+    }
+
+    @GetMapping("/add-random")
+    public String addRandomUser() {
+        User user = randomUserGenerator.get();
+        userService.createUser(user);
+        log.info("Redirecting to \"/users\"");
+
+        return "redirect:/users";
+    }
+
+
+
+    @GetMapping("/add-random")
+    public String addRandomUser() {
+        User user = randomUserGenerator.get();
         userService.createUser(user);
         log.info("Redirecting to \"/users\"");
 

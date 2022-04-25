@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<cards>
+    <card>
+        <number>4000000000000000</number>
+        <user>5</user>
+        <account>6</account>
+        <issueDate>2021-01-01</issueDate>
+        <validTill>2023-01-01</validTill>
+        <pinCode>1000</pinCode>
+        <cvv>333</cvv>
+    </card>
+    <card>
+        <number>4000222233334444</number>
+        <user>4</user>
+        <account>4</account>
+        <issueDate>2021-01-01</issueDate>
+        <validTill>2023-01-01</validTill>
+        <pinCode>1234</pinCode>
+        <cvv>123</cvv>
+    </card>
+</cards>

@@ -2,6 +2,7 @@ package com.epam.saturn.operator.service.account.transfers;
 
 import com.epam.saturn.operator.dao.Account;
 import com.epam.saturn.operator.dao.TransactionState;
+import com.epam.saturn.operator.dao.TransactionType;
 import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.CardRepository;
 import com.epam.saturn.operator.service.TransactionService;
@@ -53,7 +54,7 @@ public enum TransferContextSingleton {
 
     }
 
-    public TransactionResult transferByPhone(Account srcAccount, String phone, BigDecimal amount, String purpose) {
+    public TransactionResult transferByPhone(Account srcAccount, String phone, BigDecimal amount, String purpose, TransactionType type) {
         if (Validator.validate(phoneNumberRegexp, phone)) {
             StringBuilder log = new StringBuilder();
             try {
@@ -67,7 +68,7 @@ public enum TransferContextSingleton {
                         .findFirst()
                         .orElseThrow(() -> new IllegalArgumentException("User with this phone doesn't have default account"))
                         .getId();
-                transactionService.transfer(srcAccount.getId(), dstId, amount, purpose);
+                transactionService.transfer(srcAccount.getId(), dstId, amount, purpose, type);
             } catch (IllegalArgumentException e) {
                 log.append(e.getMessage());
                 throw e;
@@ -77,7 +78,7 @@ public enum TransferContextSingleton {
         throw new IllegalArgumentException("phone number didn't pass validation");
     }
 
-    public TransactionResult transferByCard(Account srcAccount, String card, BigDecimal amount, String purpose) {
+    public TransactionResult transferByCard(Account srcAccount, String card, BigDecimal amount, String purpose, TransactionType type) {
         if (Validator.validate(cardNumberRegexp, card)) {
             StringBuilder log = new StringBuilder();
             try {
@@ -85,7 +86,7 @@ public enum TransferContextSingleton {
                         .orElseThrow(() -> new IllegalArgumentException("No such card number at DB"))
                         .getAccount()
                         .getId();
-                transactionService.transfer(srcAccount.getId(), dstId, amount, purpose);
+                transactionService.transfer(srcAccount.getId(), dstId, amount, purpose, type);
             } catch (IllegalArgumentException e) {
                 log.append(e.getMessage());
                 throw e;
@@ -95,14 +96,14 @@ public enum TransferContextSingleton {
         throw new IllegalArgumentException("card number didn't pass validation");
     }
 
-    public TransactionResult transferByAccount(Account srcAccount, String account, BigDecimal amount, String purpose) {
+    public TransactionResult transferByAccount(Account srcAccount, String account, BigDecimal amount, String purpose, TransactionType type) {
         if (Validator.validate(accountNumberRegexp, account)) {
             StringBuilder log = new StringBuilder();
             try {
                 long dstId = accountRepository.findByNumber(account)
                         .orElseThrow(() -> new IllegalArgumentException("No such destination account"))
                         .getId();
-                transactionService.transfer(srcAccount.getId(), dstId, amount, purpose);
+                transactionService.transfer(srcAccount.getId(), dstId, amount, purpose, type);
             } catch (IllegalArgumentException e) {
                 log.append(e.getMessage());
                 throw e;

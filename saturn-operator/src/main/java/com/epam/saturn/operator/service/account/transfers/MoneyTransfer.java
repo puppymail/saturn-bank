@@ -1,6 +1,7 @@
 package com.epam.saturn.operator.service.account.transfers;
 
 import com.epam.saturn.operator.dao.Account;
+import com.epam.saturn.operator.dao.TransactionType;
 import com.epam.saturn.operator.service.account.TransactionResult;
 
 import java.math.BigDecimal;
@@ -16,7 +17,7 @@ public enum MoneyTransfer implements TransferCommand {
         this.command = command;
     }
     @Override
-    public TransactionResult execute(Account srcAccount, String dstAccount, BigDecimal amount, String purpose) {
-        return command.execute(srcAccount, dstAccount, amount, purpose);
+    public TransactionResult execute(Account srcAccount, String dstAccount, BigDecimal amount, String purpose, TransactionType type) {
+        return command.execute(srcAccount, dstAccount, amount, purpose, type);
     }
 }
