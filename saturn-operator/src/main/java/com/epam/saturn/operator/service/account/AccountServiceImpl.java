@@ -6,6 +6,7 @@ import com.epam.saturn.operator.dao.AccountType;
 import com.epam.saturn.operator.dao.AccountCoin;
 import com.epam.saturn.operator.dao.Transaction;
 import com.epam.saturn.operator.dto.AccountDto;
+import com.epam.saturn.operator.dto.TransactionResult;
 import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.UserRepository;
 import com.epam.saturn.operator.service.user.UserService;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 @Slf4j
 @Service

@@ -2,7 +2,7 @@ package com.epam.saturn.operator.service.account.transfers;
 
 import com.epam.saturn.operator.dao.Account;
 import com.epam.saturn.operator.dao.TransactionType;
-import com.epam.saturn.operator.service.account.TransactionResult;
+import com.epam.saturn.operator.dto.TransactionResult;
 
 import java.math.BigDecimal;
 

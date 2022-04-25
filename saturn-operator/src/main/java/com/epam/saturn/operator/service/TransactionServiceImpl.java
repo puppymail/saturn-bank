@@ -49,6 +49,9 @@ public class TransactionServiceImpl implements TransactionService {
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
                 transaction.setState(TransactionState.ERROR);
                 result.append("Amount can't be negative or zero, ");
+            } else if (type != TransactionType.DEPOSIT && accountSrcId == accountDstId) {
+                transaction.setState(TransactionState.CANCELLED);
+                result.append("Src account and dst accounts are same");
             } else if (type != TransactionType.DEPOSIT && accountSrc.getAmount().compareTo(amount) < 0) {
                 transaction.setState(TransactionState.CANCELLED);
                 result.append("Src account doesn't have enough money for transfer, ");
@@ -72,6 +75,6 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setDateTime(LocalDateTime.now());
         transaction.setType(type);
         transactionRepo.save(transaction);
-        return new TransactionResult(transaction.getId(), transaction.getState(), result.substring(0, result.length() - 2));
+        return new TransactionResult(transaction.getId(), transaction.getState(), transaction.getType(), result.substring(0, result.length() - 2));
     }
 }

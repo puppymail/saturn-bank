@@ -18,19 +18,14 @@ public class LoggingAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Pointcut("within(@org.springframework.stereotype.Service *)" +
-            " || within(@org.springframework.stereotype.Controller *)")
-    public void springBeanPointcut() {}
-
-    @Pointcut("within(com.epam.saturn.operator..*)" +
-            " || within(com.epam.saturn.operator.service..*)" +
-            " || within(com.epam.saturn.operator.controller..*)")
+    @Pointcut("execution(* com.epam.saturn.operator.controller..*(..)) ||" +
+            "execution(* com.epam.saturn.operator.service..*(..))")
     public void applicationPackagePointcut() {}
 
     @Pointcut("execution(* org.springframework.data.repository.Repository+.*(..))")
     public void repositoryPointcut() {}
 
-    @Around("applicationPackagePointcut() && springBeanPointcut()")
+    @Around("applicationPackagePointcut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         return log(joinPoint);
     }
@@ -40,7 +35,7 @@ public class LoggingAspect {
         return log(joinPoint);
     }
 
-    @AfterThrowing(pointcut = "applicationPackagePointcut() && springBeanPointcut()", throwing = "e")
+    @AfterThrowing(pointcut = "applicationPackagePointcut()", throwing = "e")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
         logger.error("Exception in {}.{}() with cause: {}, message: {}", joinPoint.getSignature().getDeclaringTypeName(),
                 joinPoint.getSignature().getName(), e.getCause(), e.getMessage());
