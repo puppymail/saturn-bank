@@ -138,17 +138,6 @@ public class UserController {
         return "redirect:/users";
     }
 
-
-
-    @GetMapping("/add-random")
-    public String addRandomUser() {
-        User user = randomUserGenerator.get();
-        userService.createUser(user);
-        log.info("Redirecting to \"/users\"");
-
-        return "redirect:/users";
-    }
-
     @GetMapping("/add-user")
     public String showAddUser(Model model) {
         model.addAttribute("bankUser", new UserDto());

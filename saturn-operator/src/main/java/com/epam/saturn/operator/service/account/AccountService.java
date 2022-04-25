@@ -7,6 +7,7 @@ import com.epam.saturn.operator.dao.AccountType;
 import com.epam.saturn.operator.dao.AccountCoin;
 import com.epam.saturn.operator.dao.Transaction;
 import com.epam.saturn.operator.dto.AccountDto;
+import com.epam.saturn.operator.dto.TransactionResult;
 import com.epam.saturn.operator.service.account.lists.AccountList;
 import com.epam.saturn.operator.service.account.transfers.MoneyTransfer;
 
