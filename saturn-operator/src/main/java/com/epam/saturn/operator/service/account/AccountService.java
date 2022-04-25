@@ -1,6 +1,7 @@
 package com.epam.saturn.operator.service.account;
 
 import com.epam.saturn.operator.dao.Account;
+import com.epam.saturn.operator.dao.TransactionType;
 import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.dao.AccountType;
 import com.epam.saturn.operator.dao.AccountCoin;
@@ -38,10 +39,10 @@ public interface AccountService {
         throw new IllegalArgumentException("identifier type isn't present in the enum");
     }
 
-    default TransactionResult transfer(Account srcAccount, String dstAccount, BigDecimal amount, String purpose, String idType) {
+    default TransactionResult transfer(Account srcAccount, String dstAccount, BigDecimal amount, String purpose, TransactionType transactionType, String idType) {
         for (MoneyTransfer type : MoneyTransfer.values()) {
             if (type == MoneyTransfer.valueOf(idType)){
-                return type.execute(srcAccount, dstAccount, amount, purpose);
+                return type.execute(srcAccount, dstAccount, amount, purpose, transactionType);
             }
         }
         throw new IllegalArgumentException("transfer type isn't present in the enum");
