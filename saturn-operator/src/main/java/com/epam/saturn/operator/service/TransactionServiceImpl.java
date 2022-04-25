@@ -3,6 +3,7 @@ package com.epam.saturn.operator.service;
 import com.epam.saturn.operator.dao.Account;
 import com.epam.saturn.operator.dao.Transaction;
 import com.epam.saturn.operator.dao.TransactionState;
+import com.epam.saturn.operator.dao.TransactionType;
 import com.epam.saturn.operator.dto.TransactionResult;
 import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.TransactionRepository;
@@ -26,7 +27,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public TransactionResult transfer(long accountSrcId, long accountDstId, BigDecimal amount, String purpose) {
+    public TransactionResult transfer(long accountSrcId, long accountDstId, BigDecimal amount, String purpose, TransactionType type) {
         Transaction transaction = new Transaction();
         StringBuilder result = new StringBuilder();
         transaction.setState(TransactionState.NEW);
@@ -48,14 +49,18 @@ public class TransactionServiceImpl implements TransactionService {
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
                 transaction.setState(TransactionState.ERROR);
                 result.append("Amount can't be negative or zero, ");
-            } else if (accountSrc.getAmount().compareTo(amount) < 0) {
+            } else if (type != TransactionType.DEPOSIT && accountSrc.getAmount().compareTo(amount) < 0) {
                 transaction.setState(TransactionState.CANCELLED);
                 result.append("Src account doesn't have enough money for transfer, ");
             } else {
-                accountSrc.setAmount(accountSrc.getAmount().subtract(amount));
-                accountDst.setAmount(accountDst.getAmount().add(amount));
-                accountRepo.save(accountSrc);
-                accountRepo.save(accountDst);
+                if (type != TransactionType.DEPOSIT) {
+                    accountSrc.setAmount(accountSrc.getAmount().subtract(amount));
+                    accountRepo.save(accountSrc);
+                }
+                if (type != TransactionType.WITHDRAW) {
+                    accountDst.setAmount(accountDst.getAmount().add(amount));
+                    accountRepo.save(accountDst);
+                }
                 transaction.setState(TransactionState.DONE);
                 result.append("Transaction completed successfully, ");
             }
@@ -65,6 +70,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setAmount(amount);
         transaction.setPurpose(purpose);
         transaction.setDateTime(LocalDateTime.now());
+        transaction.setType(type);
         transactionRepo.save(transaction);
         return new TransactionResult(transaction.getId(), transaction.getState(), result.substring(0, result.length() - 2));
     }
