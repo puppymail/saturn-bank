@@ -4,7 +4,7 @@ import com.epam.saturn.operator.dao.Account;
 import com.epam.saturn.operator.dao.Transaction;
 import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.TransactionRepository;
-import com.epam.saturn.operator.service.TransactionService;
+import com.epam.saturn.operator.service.TransactionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,19 +20,11 @@ public class TransactionController {
 
     private final AccountRepository accountRepo;
     private final TransactionRepository transactionRepo;
-    private final TransactionService transactionService;
 
     @Autowired
-    public TransactionController(AccountRepository accountRepo, TransactionRepository transactionRepo, TransactionService transactionService) {
+    public TransactionController(AccountRepository accountRepo, TransactionRepository transactionRepo) {
         this.accountRepo = accountRepo;
         this.transactionRepo = transactionRepo;
-        this.transactionService = transactionService;
-    }
-
-    @GetMapping("/add-transaction-by-service&src-id={accountSrcId}&dst-id={accountDstId}&amount={amount}&purpose={purpose}")
-    public String addTransactionByService(@PathVariable long accountSrcId, @PathVariable long accountDstId, @PathVariable BigDecimal amount, @PathVariable String purpose) {
-        transactionService.transfer(accountSrcId, accountDstId, amount, purpose);
-        return "redirect:/transactions/";
     }
 
     @GetMapping("/print-all")

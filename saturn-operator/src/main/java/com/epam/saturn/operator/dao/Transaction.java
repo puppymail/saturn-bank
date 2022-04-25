@@ -48,4 +48,7 @@ public class Transaction {
     @Enumerated
     private TransactionState state;
 
+    @Enumerated
+    private TransactionType type;
+
 }
