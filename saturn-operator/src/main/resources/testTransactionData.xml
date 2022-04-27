@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <transactions>
     <transaction>
-        <accountSrc>2</accountSrc>
-        <accountDst>4</accountDst>
+        <accountSrc>60000000000000000001</accountSrc>
+        <accountDst>60000000000000000003</accountDst>
         <amount>200</amount>
         <purpose>test</purpose>
         <state>DONE</state>
@@ -10,8 +10,8 @@
         <type>DEPOSIT</type>
     </transaction>
     <transaction>
-        <accountSrc>5</accountSrc>
-        <accountDst>3</accountDst>
+        <accountSrc>60000000000000000004</accountSrc>
+        <accountDst>60000000000000000002</accountDst>
         <amount>200</amount>
         <purpose>test</purpose>
         <state>DONE</state>
@@ -19,8 +19,8 @@
         <type>WITHDRAW</type>
     </transaction>
     <transaction>
-        <accountSrc>5</accountSrc>
-        <accountDst>4</accountDst>
+        <accountSrc>60000000000000000004</accountSrc>
+        <accountDst>60000000000000000003</accountDst>
         <amount>1000000</amount>
         <purpose>test</purpose>
         <state>CANCELLED</state>
@@ -28,8 +28,8 @@
         <type>TRANSFER</type>
     </transaction>
     <transaction>
-        <accountSrc>5</accountSrc>
-        <accountDst>4</accountDst>
+        <accountSrc>60000000000000000004</accountSrc>
+        <accountDst>60000000000000000003</accountDst>
         <amount>1000</amount>
         <purpose>test</purpose>
         <state>DONE</state>
@@ -37,8 +37,8 @@
         <type>TRANSFER</type>
     </transaction>
     <transaction>
-        <accountSrc>5</accountSrc>
-        <accountDst>4</accountDst>
+        <accountSrc>60000000000000000004</accountSrc>
+        <accountDst>60000000000000000003</accountDst>
         <amount>2000</amount>
         <purpose>test</purpose>
         <state>DONE</state>

@@ -28,13 +28,11 @@ public class Transaction {
     @Column(name = "id", nullable = false)
     private long id;
 
-    @ManyToOne
-    @JoinColumn(name = "account_src", referencedColumnName = "id")
-    private Account src;
+    @Column(name = "account_src")
+    private String src;
 
-    @ManyToOne
-    @JoinColumn(name = "account_dst", referencedColumnName = "id")
-    private Account dst;
+    @Column(name = "account_dst")
+    private String dst;
 
     @Column
     private BigDecimal amount;

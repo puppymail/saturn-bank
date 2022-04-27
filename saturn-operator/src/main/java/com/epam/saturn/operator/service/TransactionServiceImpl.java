@@ -5,6 +5,7 @@ import com.epam.saturn.operator.dao.Transaction;
 import com.epam.saturn.operator.dao.TransactionState;
 import com.epam.saturn.operator.dao.TransactionType;
 import com.epam.saturn.operator.dto.TransactionResult;
+import com.epam.saturn.operator.service.TransactionService;
 import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -27,20 +29,20 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public TransactionResult transfer(long accountSrcId, long accountDstId, BigDecimal amount, String purpose, TransactionType type) {
+    public TransactionResult transfer(String accountSrcNumber, String accountDstNumber, BigDecimal amount, String purpose, TransactionType type) {
         Transaction transaction = new Transaction();
         StringBuilder result = new StringBuilder();
         transaction.setState(TransactionState.NEW);
         Account accountSrc = null;
         Account accountDst = null;
         try {
-            accountSrc = accountRepo.findById(accountSrcId).orElseThrow();
+            accountSrc = accountRepo.findByNumber(accountSrcNumber).orElseThrow();
         } catch (NoSuchElementException e) {
             transaction.setState(TransactionState.ERROR);
             result.append("No such src account in DB, ");
         }
         try {
-            accountDst = accountRepo.findById(accountDstId).orElseThrow();
+            accountDst = accountRepo.findByNumber(accountDstNumber).orElseThrow();
         } catch (NoSuchElementException e) {
             transaction.setState(TransactionState.ERROR);
             result.append("No such dst account in DB, ");
@@ -49,7 +51,7 @@ public class TransactionServiceImpl implements TransactionService {
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
                 transaction.setState(TransactionState.ERROR);
                 result.append("Amount can't be negative or zero, ");
-            } else if (type != TransactionType.DEPOSIT && accountSrcId == accountDstId) {
+            } else if (type != TransactionType.DEPOSIT && accountSrcNumber.equals(accountDstNumber)) {
                 transaction.setState(TransactionState.CANCELLED);
                 result.append("Src account and dst accounts are same");
             } else if (type != TransactionType.DEPOSIT && accountSrc.getAmount().compareTo(amount) < 0) {
@@ -68,8 +70,8 @@ public class TransactionServiceImpl implements TransactionService {
                 result.append("Transaction completed successfully, ");
             }
         }
-        transaction.setSrc(accountSrc);
-        transaction.setDst(accountDst);
+        transaction.setSrc(accountSrcNumber);
+        transaction.setDst(accountDstNumber);
         transaction.setAmount(amount);
         transaction.setPurpose(purpose);
         transaction.setDateTime(LocalDateTime.now());

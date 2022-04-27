@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class TransactionDto {
 
-    private long accountSrc;
-    private long accountDst;
+    private String accountSrc;
+    private String accountDst;
     private BigDecimal amount;
     private String purpose;
     private TransactionType type;
