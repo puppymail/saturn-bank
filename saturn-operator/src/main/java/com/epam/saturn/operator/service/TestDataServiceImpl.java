@@ -195,24 +195,8 @@ public class TestDataServiceImpl implements TestDataService{
         for (int i = 0; i < nodeList.getLength(); ++i){
             Transaction transaction = new Transaction();
             node = nodeList.item(i);
-            Account accountId = new Account();
-            accountId.setId(Long.parseLong(Objects.requireNonNull(getChildContent((Element) node, "accountSrc")).getTextContent()));
-            Example<Account> exAccount = Example.of(accountId, ExampleMatcher.matching().withIgnorePaths("isDefault", "isDeleted"));
-            accountId = Objects.requireNonNull(accountRepository.findAll(exAccount)).get(0);
-            if (accountId != null){
-                transaction.setSrc(accountId);
-            } else {
-                throw new IOException("invalid source account id in the source file");
-            }
-            accountId = new Account();
-            accountId.setId(Long.parseLong(Objects.requireNonNull(getChildContent((Element) node, "accountDst")).getTextContent()));
-            exAccount = Example.of(accountId, ExampleMatcher.matching().withIgnorePaths("isDefault", "isDeleted"));
-            accountId = Objects.requireNonNull(accountRepository.findAll(exAccount)).get(0);
-            if (accountId != null){
-                transaction.setDst(accountId);
-            } else {
-                throw new IOException("invalid destination account id in the source file");
-            }
+            transaction.setSrc(Objects.requireNonNull(getChildContent((Element) node, "accountSrc")).getTextContent());
+            transaction.setDst(Objects.requireNonNull(getChildContent((Element) node, "accountDst")).getTextContent());
             transaction.setAmount(BigDecimal.valueOf(Double.parseDouble(Objects.requireNonNull(getChildContent((Element) node, "amount")).getTextContent())));
             transaction.setPurpose(Objects.requireNonNull(getChildContent((Element) node, "purpose")).getTextContent());
             transaction.setState(TransactionState.valueOf(Objects.requireNonNull(getChildContent((Element) node, "state")).getTextContent()));
