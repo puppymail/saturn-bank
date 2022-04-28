@@ -6,15 +6,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Properties;
+import java.util.Random;
 
 @Slf4j
 public class CardFactory {
 
     private static final String DEFAULT_CARD_DATA_PROPERTIES = "defaultCardData.properties";
 
-    private static final String DEFAULT_NUMBER;
-    private static final String DEFAULT_PINCODE;
-    private static final String DEFAULT_CVV2;
+    private static final int PIN_CODE_RANGE = 9999;
+    private static final int CVV2_RANGE = 999;
+
+    private static final String BIN_NUMBER;
+    private static final String IDENTITY_DEFAULT_NUMBER;
     private static final int DEFAULT_VALIDITY_PERIOD;
 
     static {
@@ -29,9 +32,8 @@ public class CardFactory {
             log.error("!Couldn't load default card data!");
             e.printStackTrace();
         }
-        DEFAULT_NUMBER = defaultCardData.getProperty("number");
-        DEFAULT_PINCODE = defaultCardData.getProperty("pincode");
-        DEFAULT_CVV2 = defaultCardData.getProperty("cvv2");
+        BIN_NUMBER = defaultCardData.getProperty("bin_number");
+        IDENTITY_DEFAULT_NUMBER = defaultCardData.getProperty("identity_default_number");
         DEFAULT_VALIDITY_PERIOD = Integer.parseInt(defaultCardData.getProperty("validityPeriod"));
     }
 
@@ -44,23 +46,28 @@ public class CardFactory {
 
         card.setAccount(account);
         card.setUser(user);
-        card.setNumber(generateCardNumber());
+        card.setNumber(generateCardNumber(account));
         card.setCvv2(generateCVV2());
-        card.setPinCode(DEFAULT_PINCODE);
+        card.setPinCode(generatePinCode());
         card.setIssueDate(LocalDate.now());
         card.setValidTill(card.getIssueDate().plusYears(cardValidityPeriod));
 
         return card;
     }
 
-    // TODO implement card number generation
-    protected static String generateCardNumber() {
-        return DEFAULT_NUMBER;
+    protected static String generateCardNumber(Account account) {
+
+        return BIN_NUMBER +
+                account.getCoin().code +
+                account.getType().code +
+                IDENTITY_DEFAULT_NUMBER;
     }
 
-    // TODO implement CVV generation
+    private static String generatePinCode() {
+        return String.format("%04d", new Random().nextInt(PIN_CODE_RANGE));
+    }
+
     protected static String generateCVV2() {
-        return DEFAULT_CVV2;
+        return String.format("%03d", new Random().nextInt(CVV2_RANGE));
     }
-
 }

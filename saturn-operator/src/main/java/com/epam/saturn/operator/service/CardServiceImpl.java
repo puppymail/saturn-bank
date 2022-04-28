@@ -59,7 +59,15 @@ public class CardServiceImpl implements CardService {
 
         cardRepository.save(card);
 
-        return card;
+        Card savedCard = cardRepository.findById(card.getId()).orElseThrow(() -> new IllegalArgumentException("Saved card not found"));
+        String binNumber = savedCard.getNumber().substring(0, 6);
+        String coinType = savedCard.getNumber().substring(6, 8);
+        String accountType = savedCard.getNumber().substring(8, 11);
+        String identityNumber = String.format("%05d", savedCard.getId());
+
+        savedCard.setNumber(binNumber + coinType + accountType + identityNumber);
+
+        return savedCard;
     }
 
     public Card issueCard(Account account) {

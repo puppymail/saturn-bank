@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/cards")
 public class CardController {
 
+    private static final String NO_ACCOUNT_WITH_THIS_NUMBER = "No account with this number";
+    private static final String NO_USER_WITH_THIS_ID = "No user with this id";
+
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
@@ -32,16 +35,12 @@ public class CardController {
         this.cardService = cardService;
     }
 
-    @GetMapping("/issue-card")
-    public String issueCard() {
-        Account account = accountRepository.findAll()
-                .stream()
-                .findAny()
-                .orElseThrow();
-        User user = userRepository.findAll()
-                .stream()
-                .findAny()
-                .orElseThrow();
+    @GetMapping("/issue-card-for&account-number={accountNumber}&user-id={userId}")
+    public String issueCard(@PathVariable String accountNumber, @PathVariable long userId) {
+        Account account = accountRepository.findByNumber(accountNumber)
+                .orElseThrow(() -> new IllegalArgumentException(NO_ACCOUNT_WITH_THIS_NUMBER));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException(NO_USER_WITH_THIS_ID));
         Card card = cardService.issueCard(account, user);
         return "redirect:/cards";
     }
