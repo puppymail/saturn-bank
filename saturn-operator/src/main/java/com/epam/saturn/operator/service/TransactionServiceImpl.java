@@ -5,7 +5,6 @@ import com.epam.saturn.operator.dao.Transaction;
 import com.epam.saturn.operator.dao.TransactionState;
 import com.epam.saturn.operator.dao.TransactionType;
 import com.epam.saturn.operator.dto.TransactionResult;
-import com.epam.saturn.operator.service.TransactionService;
 import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -51,6 +49,9 @@ public class TransactionServiceImpl implements TransactionService {
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
                 transaction.setState(TransactionState.ERROR);
                 result.append("Amount can't be negative or zero, ");
+            } else if (accountSrc.getCoin() != accountDst.getCoin()) {
+                transaction.setState(TransactionState.CANCELLED);
+                result.append("Src account and dst account have incompatible currency types, ");
             } else if (type != TransactionType.DEPOSIT && accountSrcNumber.equals(accountDstNumber)) {
                 transaction.setState(TransactionState.CANCELLED);
                 result.append("Src account and dst accounts are same");
