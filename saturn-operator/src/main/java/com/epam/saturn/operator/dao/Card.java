@@ -19,7 +19,6 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@ToString
 @Table(name = "card")
 @SQLDelete(sql = "UPDATE saturn_bank.card SET is_deleted = true WHERE id=?")
 @Where(clause = "is_deleted=false")
@@ -47,16 +46,26 @@ public class Card implements SoftDeleteEntity {
     @Column(name = "valid_till")
     private LocalDate validTill;
 
-    @ToString.Exclude
     @Column(name = "pincode")
     private String pinCode;
 
-    @ToString.Exclude
     @Column(name = "cvv2")
     private String cvv2;
 
     @Column(name = "is_deleted")
     private boolean isDeleted = Boolean.FALSE;
 
+    @Override
+    public String toString() {
+        return "Card{" +
+                "id=" + id +
+                ", number='" + number + '\'' +
+                ", user=" + user.getLastName() + " " + user.getFirstName() + " " + user.getMiddleName() +
+                ", account=" + account.getNumber() +
+                ", issueDate=" + issueDate +
+                ", validTill=" + validTill +
+                ", isDeleted=" + isDeleted +
+                '}';
+    }
 }
 

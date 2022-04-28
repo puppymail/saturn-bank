@@ -11,6 +11,8 @@ import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.repository.CardRepository;
 import com.epam.saturn.operator.repository.UserRepository;
 import com.epam.saturn.operator.service.validation.PinCodeValidator;
+import com.epam.saturn.operator.service.validation.ValidationStrings;
+import com.epam.saturn.operator.service.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -76,23 +78,27 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public void changePinCodeByOperator(String cardNumber) {
-        Card existingCard = cardRepository.findByNumber(cardNumber)
-                .orElseThrow(() -> new IllegalArgumentException("No such card number at DB"));
-        existingCard.setPinCode(generatePinCode());
-        cardRepository.save(existingCard);
-        log.info("Card pincode was changed at card with number: " + existingCard.getNumber());
-
+        if (Validator.validate(ValidationStrings.cardNumberRegexp, cardNumber)) {
+            Card existingCard = cardRepository.findByNumber(cardNumber)
+                    .orElseThrow(() -> new IllegalArgumentException("No such card number at DB"));
+            existingCard.setPinCode(generatePinCode());
+            cardRepository.save(existingCard);
+            log.info("Card pincode was changed at card with number: " + existingCard.getNumber());
+        }
+        throw new IllegalArgumentException("card number didn't pass validation");
     }
 
     @Override
     public void changePinCodeByClient(String cardNumber, String oldPinCode, String newPinCode) {
-        Card existingCard = cardRepository.findByNumber(cardNumber)
-                .orElseThrow(() -> new IllegalArgumentException("No such card number at DB"));
-        PinCodeValidator.validatePinCode(existingCard.getPinCode(), oldPinCode, newPinCode);
-        existingCard.setPinCode(newPinCode);
-        cardRepository.save(existingCard);
-        log.info("Card pincode was changed at card with number: " + existingCard.getNumber());
-
+        if (Validator.validate(ValidationStrings.cardNumberRegexp, cardNumber)) {
+            Card existingCard = cardRepository.findByNumber(cardNumber)
+                    .orElseThrow(() -> new IllegalArgumentException("No such card number at DB"));
+            PinCodeValidator.validatePinCode(existingCard.getPinCode(), oldPinCode, newPinCode);
+            existingCard.setPinCode(newPinCode);
+            cardRepository.save(existingCard);
+            log.info("Card pincode was changed at card with number: " + existingCard.getNumber());
+        }
+        throw new IllegalArgumentException("card number didn't pass validation");
     }
 
     private String generatePinCode() {
