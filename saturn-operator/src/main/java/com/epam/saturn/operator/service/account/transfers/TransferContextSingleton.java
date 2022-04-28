@@ -27,6 +27,7 @@ public enum TransferContextSingleton {
     private AccountRepository accountRepository;
     private UserService userService;
     private CardRepository cardRepository;
+    private final String WITHDRAW_TO_CASH_NUMBER = "99999999999999999999";
 
     @Component
     public static class TransferContextSingletonServiceInjector {
@@ -82,10 +83,12 @@ public enum TransferContextSingleton {
 
     public TransactionResult transferByAccount(Account srcAccount, String account, BigDecimal amount, String purpose, TransactionType type) {
         if (Validator.validate(accountNumberRegexp, account)) {
-            String dstNumber = accountRepository.findByNumber(account)
-                    .orElseThrow(() -> new IllegalArgumentException("No such destination account"))
-                    .getNumber();
-            return transactionService.transfer(srcAccount.getNumber(), dstNumber, amount, purpose, type);
+            if (!account.equals(WITHDRAW_TO_CASH_NUMBER)) {
+                String dstNumber = accountRepository.findByNumber(account)
+                        .orElseThrow(() -> new IllegalArgumentException("No such destination account"))
+                        .getNumber();
+            }
+            return transactionService.transfer(srcAccount.getNumber(), account, amount, purpose, type);
         }
         throw new IllegalArgumentException("account number didn't pass validation");
     }

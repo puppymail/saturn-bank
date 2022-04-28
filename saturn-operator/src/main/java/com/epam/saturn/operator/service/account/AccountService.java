@@ -3,10 +3,9 @@ package com.epam.saturn.operator.service.account;
 import com.epam.saturn.operator.dao.Account;
 import com.epam.saturn.operator.dao.TransactionType;
 import com.epam.saturn.operator.dao.User;
-import com.epam.saturn.operator.dao.AccountType;
-import com.epam.saturn.operator.dao.AccountCoin;
-import com.epam.saturn.operator.dao.Transaction;
 import com.epam.saturn.operator.dto.AccountDto;
+import com.epam.saturn.operator.dto.TimeRange;
+import com.epam.saturn.operator.dto.TransactionHistoryDto;
 import com.epam.saturn.operator.dto.TransactionResult;
 import com.epam.saturn.operator.service.account.lists.AccountList;
 import com.epam.saturn.operator.service.account.transfers.MoneyTransfer;
@@ -22,13 +21,13 @@ public interface AccountService {
     void closeAccount(Account account);
     void setAccountDefault(Long id);
 
-    TransactionResult depositMoney(Account account, BigDecimal amount);
-    TransactionResult withdrawMoney(Account account, BigDecimal amount);
-    List<Transaction> getAccountTransactionHistory(Account account);
+    List<TransactionHistoryDto> getAccountTransactionsHistory(Account account, Boolean full);
+    List<TransactionHistoryDto> getAccountTransactionsHistoryForTimeRange(Account account, TimeRange range);
 
     List<Account> getAllUserAccounts(User user);
     List<Account> getActiveUserAccounts(User user);
-    Optional<Account> getAccount(Long id);
+    Optional<Account> findAccountByAccountId(Long idAcc);
+
     List<Account> findAll();
 
     default List<Account> getAllAccounts(String id, String idType) {

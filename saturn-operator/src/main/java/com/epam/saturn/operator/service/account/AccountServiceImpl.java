@@ -1,25 +1,36 @@
 package com.epam.saturn.operator.service.account;
 
 import com.epam.saturn.operator.dao.Account;
-import com.epam.saturn.operator.dao.User;
-import com.epam.saturn.operator.dao.AccountType;
-import com.epam.saturn.operator.dao.AccountCoin;
 import com.epam.saturn.operator.dao.Transaction;
+import com.epam.saturn.operator.dao.TransactionType;
+import com.epam.saturn.operator.dao.AccountCoin;
+import com.epam.saturn.operator.dao.AccountType;
+import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.dto.AccountDto;
-import com.epam.saturn.operator.dto.TransactionResult;
+import com.epam.saturn.operator.dto.TimeRange;
+import com.epam.saturn.operator.dto.TransactionHistoryDto;
 import com.epam.saturn.operator.repository.AccountRepository;
+import com.epam.saturn.operator.repository.TransactionRepository;
 import com.epam.saturn.operator.repository.UserRepository;
+import com.epam.saturn.operator.service.TransactionService;
 import com.epam.saturn.operator.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.Comparator;
 
 @Slf4j
 @Service
@@ -28,38 +39,48 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final TransactionService transactionService;
+    private final TransactionRepository transactionRepository;
+    private final Session session;
+    private final BigDecimal INITIAL_ACCOUNT_AMOUNT = new BigDecimal("0.00");
+    private final String FILTER_ONLY_ACTIVE_ACCOUNTS = "activeAccountsOnlyFilter";
+    private final String TRANSACTION_PURPOSE_CLOSING_ACCOUNT = "From closed account";
+    private final String WITHDRAW_TO_CASH_NUMBER = "99999999999999999999";
+    private final String MONEY_TRANSFER_BY_ACCOUNT = "BY_ACCOUNT";
 
     @Autowired
-    public AccountServiceImpl(AccountRepository accountRepository, UserRepository userRepository, UserService userService) {
+    public AccountServiceImpl(AccountRepository accountRepository,
+                              UserRepository userRepository,
+                              UserService userService,
+                              TransactionService transactionService,
+                              TransactionRepository transactionRepository,
+                              EntityManager entityManager) {
+
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.transactionService=transactionService;
+        this.transactionRepository = transactionRepository;
+        session = entityManager.unwrap(Session.class);
     }
 
+    @Transactional
     @Override
     public Account openAccount(AccountDto accountDto) {
         final Long id = accountDto.getUserId();
         final User user = getUserById(id);
-        return openAccount(user,
-                accountDto.getIsDefault(),
-                accountDto.getType(),
-                accountDto.getCoin(),
-                accountDto.getPercent());
-    }
-
-    private Account openAccount(User user, Boolean isDefault, AccountType type, AccountCoin coin, BigDecimal percent) {
         Account account = Account.builder()
-                    .number(AccountNumberProvider.getDefaultAccountNumber())
-                    .user(user)
-                    .cards(new ArrayList<>())
-                    .type(type)
-                    .percent(percent)
-                    .amount(new BigDecimal("0.0"))
-                    .coin(coin)
-                    .build();
+                .number(AccountNumberProvider.getDefaultAccountNumber())
+                .user(user)
+                .cards(new ArrayList<>())
+                .type(accountDto.getType())
+                .percent(accountDto.getPercent())
+                .amount(INITIAL_ACCOUNT_AMOUNT)
+                .coin(accountDto.getCoin())
+                .build();
         accountRepository.save(account);
-        setAccountNumber(account, type, coin);
-        setDefaultStatus(account, user, isDefault);
+        setAccountNumber(account, accountDto.getType(), accountDto.getCoin());
+        setDefaultStatus(account, user, accountDto.getIsDefault());
         return account;
     }
 
@@ -69,62 +90,138 @@ public class AccountServiceImpl implements AccountService {
         setDefaultStatus(account, account.getUser(), true);
     }
 
+    @Transactional
     @Override
     public void closeAccount(Account account) {
+        session.enableFilter(FILTER_ONLY_ACTIVE_ACCOUNTS);
         checkAccountExistence(account);
+        User user = account.getUser();
+        checkUserExistence(user);
         if (account.isDefault()) {
-            User user = account.getUser();
-            checkUserExistence(user);
-            getActiveUserAccounts(user)
+            allAccountsExceptForCurrent(user, account)
                     .stream()
-                    .filter(accDif -> accDif.getId().longValue() != account.getId().longValue())
                     .findFirst()
                     .ifPresent(acc -> {
                         acc.setDefault(true);
                         accountRepository.save(acc);
                     });
         }
-        accountRepository.delete(account);
+        if (!account.getAmount().equals(INITIAL_ACCOUNT_AMOUNT)) {
+            Optional<Account> dstClosingTransferOptional = allAccountsExceptForCurrent(user, account)
+                    .stream()
+                    .filter(Account::isDefault)
+                    .findFirst();
+            if(dstClosingTransferOptional.isEmpty()) {
+                transfer(account,
+                        WITHDRAW_TO_CASH_NUMBER,
+                        account.getAmount(),
+                        TRANSACTION_PURPOSE_CLOSING_ACCOUNT,
+                        TransactionType.WITHDRAW,
+                        MONEY_TRANSFER_BY_ACCOUNT);
+            } else {
+                Account dstClosingTransfer = dstClosingTransferOptional.get();
+                transfer(account,
+                        dstClosingTransfer.getNumber(),
+                        account.getAmount(),
+                        TRANSACTION_PURPOSE_CLOSING_ACCOUNT,
+                        TransactionType.TRANSFER,
+                        MONEY_TRANSFER_BY_ACCOUNT);
+            }
+        }
+        //TODO: resolve @transactional problem better
+        Account accountToDelete = getAccountById(account.getId());
+        accountRepository.delete(accountToDelete);
+    }
+
+    private List<Account> allAccountsExceptForCurrent(User user, Account account) {
+        return getActiveUserAccounts(user)
+                .stream()
+                .filter(accDif -> accDif.getId().longValue() != account.getId().longValue())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public TransactionResult depositMoney(Account account, BigDecimal amount) {
-        //TODO: implement
-        throw new UnsupportedOperationException();
+    public List<TransactionHistoryDto> getAccountTransactionsHistory(Account account, Boolean full) {
+        session.disableFilter(FILTER_ONLY_ACTIVE_ACCOUNTS);
+        checkAccountExistence(account);
+        List<Transaction> transactions = getFullTransactionListForAccount(account);
+        List<TransactionHistoryDto> transactionDtos = getTransactionDtoList(transactions);
+        if (!transactionDtos.isEmpty() && !full) {
+            TimeRange oneMonthRange = new TimeRange(LocalDate.now().minusDays(30), LocalDate.now());
+            System.out.println(oneMonthRange);
+            return limitTransactionsHistoryByTimeRange(transactionDtos, oneMonthRange);
+        }
+        return transactionDtos;
     }
 
     @Override
-    public TransactionResult withdrawMoney(Account account, BigDecimal amount) {
-        //TODO: implement
-        throw new UnsupportedOperationException();
+    public List<TransactionHistoryDto> getAccountTransactionsHistoryForTimeRange(Account account, TimeRange range) {
+        session.disableFilter(FILTER_ONLY_ACTIVE_ACCOUNTS);
+        checkAccountExistence(account);
+        List<Transaction> transactions = getFullTransactionListForAccount(account);
+        List<TransactionHistoryDto> transactionDtos = getTransactionDtoList(transactions);
+        return limitTransactionsHistoryByTimeRange(transactionDtos, range);
     }
 
-    @Override
-    public List<Transaction> getAccountTransactionHistory(Account account) {
-        //TODO: implement
-        throw new UnsupportedOperationException();
+    private List<Transaction> getFullTransactionListForAccount(Account account) {
+        session.disableFilter(FILTER_ONLY_ACTIVE_ACCOUNTS);
+        List<Transaction> transactions = transactionRepository.findBySrc(account.getNumber());
+        transactions.addAll(transactionRepository.findByDst(account.getNumber()));
+        return transactions.stream()
+                .sorted(Comparator.comparing(Transaction::getDateTime))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Account> getAllUserAccounts(User user) {
+        session.disableFilter(FILTER_ONLY_ACTIVE_ACCOUNTS);
         checkUserExistence(user);
-        return accountRepository.findAllAccounts(user);
+        return accountRepository.findAccountsByUser(user);
     }
 
     @Override
     public List<Account> getActiveUserAccounts(User user) {
+        session.enableFilter(FILTER_ONLY_ACTIVE_ACCOUNTS);
         checkUserExistence(user);
-        return accountRepository.findByUser(user);
+        return accountRepository.findAccountsByUser(user);
     }
 
     @Override
     public List<Account> findAll() {
+        session.enableFilter(FILTER_ONLY_ACTIVE_ACCOUNTS);
         return accountRepository.findAll();
     }
 
     @Override
-    public Optional<Account> getAccount(Long id) {
-        return accountRepository.findById(id);
+    public Optional<Account> findAccountByAccountId(Long id) {
+        session.disableFilter(FILTER_ONLY_ACTIVE_ACCOUNTS);
+        return accountRepository.findAccountById(id);
+    }
+
+    private List<TransactionHistoryDto> getTransactionDtoList(List<Transaction> transactions) {
+        List<TransactionHistoryDto> transactionDtoList = new ArrayList<>();
+        for (Transaction transaction : transactions) {
+            transactionDtoList.add(TransactionHistoryDto.builder()
+                    .id(transaction.getId())
+                    .srcNumber(transaction.getSrc())
+                    .dstNumber(transaction.getDst())
+                    .amount(transaction.getAmount())
+                    .purpose(transaction.getPurpose())
+                    .dateTime(transaction.getDateTime())
+                    .state(transaction.getState().name())
+                    .build());
+        }
+        return transactionDtoList;
+    }
+
+    private List<TransactionHistoryDto> limitTransactionsHistoryByTimeRange(List<TransactionHistoryDto> transactionDtos, TimeRange range) {
+        ChronoLocalDateTime<LocalDate> start = range.getStart().atStartOfDay();
+        ChronoLocalDateTime<LocalDate> end = range.getEnd().plusDays(1).atStartOfDay();
+        return transactionDtos.stream()
+                .sorted(Comparator.comparing(TransactionHistoryDto::getDateTime))
+                .filter(transactionDto -> transactionDto.getDateTime().isAfter(start))
+                .filter(transactionDto -> transactionDto.getDateTime().isBefore(end))
+                .collect(Collectors.toList());
     }
 
     private void setDefaultStatus(Account account, User user, Boolean isDefault) {
@@ -132,15 +229,15 @@ public class AccountServiceImpl implements AccountService {
             setAllAccountsNotDefault(account, user);
             account.setDefault(true);
         } else {
-            if (noDefaultAccount(user)) {
+            if (getDefaultAccount(user).isEmpty()) {
                 account.setDefault(true);
             }
         }
         accountRepository.save(account);
     }
 
-    private boolean noDefaultAccount(User user) {
-        return getActiveUserAccounts(user).stream().noneMatch(Account::isDefault);
+    private Optional<Account> getDefaultAccount(User user) {
+        return getActiveUserAccounts(user).stream().filter(Account::isDefault).findFirst();
     }
 
     private void setAllAccountsNotDefault(Account account, User user) {
@@ -172,7 +269,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private Account getAccountById(Long id) {
-        Optional<Account> accountOptional = getAccount(id);
+        Optional<Account> accountOptional = findAccountByAccountId(id);
         if (accountOptional.isEmpty()) {
             throw new NoSuchElementException("Account not found.");
         }

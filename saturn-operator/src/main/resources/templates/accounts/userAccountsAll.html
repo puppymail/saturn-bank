@@ -9,7 +9,7 @@
 <h4>Accounts</h4>
 <div th:each="account : ${accounts}">
     <span><b>ID</b>: </span>
-    <a th:href="@{/accounts/all-accounts-for{id}/{idAcc}(id=${account.getUser.getId()}, idAcc=${account.getId})}">
+    <a th:href="@{/accounts/all-accounts/{id}/{idAcc}(id=${account.getUser.getId()}, idAcc=${account.getId})}">
         <span th:text="${account.getId()}">id</span>
     </a>
 
@@ -24,8 +24,8 @@
 </div>
 <table>
     <td scope="col" style="text-align:center">
-            <form th:method="GET" th:action="@{/accounts/accounts-for{id}(id=${bankUser.getId()})}">
-                <input type="submit" value="BACK TO USER ACCOUNTS">
+            <form th:method="GET" th:action="@{/accounts/accounts-info/{id}(id=${bankUser.getId()})}">
+                <input type="submit" value="CLIENT ACCOUNTS INFO">
             </form>
     </td>
 </table>

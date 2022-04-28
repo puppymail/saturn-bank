@@ -17,9 +17,9 @@ import lombok.ToString;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -32,7 +32,8 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "account")
 @SQLDelete(sql = "UPDATE saturn_bank.account SET is_deleted = true, is_default = false WHERE id=?")
-@Where(clause = "is_deleted = false")
+@FilterDef(name = "activeAccountsOnlyFilter", defaultCondition = "is_deleted = 'false'")
+@Filter(name = "activeAccountsOnlyFilter")
 @Entity
 public class Account implements SoftDeleteEntity {
 

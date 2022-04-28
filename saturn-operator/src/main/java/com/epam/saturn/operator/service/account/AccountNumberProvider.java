@@ -68,6 +68,6 @@ public class AccountNumberProvider {
         if (zerosCount == 0) {
             return sid;
         }
-        return sid + ZEROS.substring(0, zerosCount);
+        return ZEROS.substring(0, zerosCount) + sid;
     }
 }

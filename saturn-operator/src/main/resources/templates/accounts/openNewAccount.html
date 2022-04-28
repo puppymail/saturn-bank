@@ -33,7 +33,7 @@
 </table>
 </p>
 <p>
-<form th:method="POST" th:action="@{/accounts/add-account-for{id}(id=${bankUser.getId()})}" th:object="${accountDto}">
+<form th:method="POST" th:action="@{/accounts/add-account/{id}(id=${bankUser.getId()})}" th:object="${accountDto}">
     <div>Choose new account parameters:</div>
     <input type="hidden" name="userId" th:value="${bankUser.getId()}"/>
     <br>
@@ -71,8 +71,8 @@
 <p/>
 <table>
     <td scope="col" style="text-align:left">
-        <form th:method="GET" th:action="@{/accounts/accounts-for{id}(id=${bankUser.getId()})}">
-            <input type="submit" value="BACK TO USER ACCOUNTS">
+        <form th:method="GET" th:action="@{/accounts/accounts-info/{id}(id=${bankUser.getId()})}">
+            <input type="submit" value="CLIENT ACCOUNTS INFO">
         </form>
     </td>
 </table>

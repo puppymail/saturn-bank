@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Account History</title>
+    <link rel="stylesheet" th:href="@{/styles.css}"/>
+    <style>
+    p {
+    border: 2px solid powderblue;
+    }
+    </style>
+</head>
+<body>
+<h4>
+    <span>Current Account: </span>
+    <span th:text="${account.getNumber()}">Number</span>
+</h4>
+<div th:if="${fullHistoryPeriod != null}">
+<div th:if="${!fullHistoryPeriod}">
+    <h4>Transactions for the last 30 days</h4>
+    <table>
+        <tr>
+            <td scope="col" style="text-align:left">
+                <form th:method="GET" th:action="@{/accounts/all-accounts/{id}/{idAcc}/account-history/{full}(id=${bankUser.getId()}, idAcc=${account.getId()}, full='true')}">
+                    <input type="submit" value="GET FULL HISTORY">
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+<div th:if ="${fullHistoryPeriod}">
+    <h4>Full account transactions history</h4>
+    <table>
+        <tr>
+            <td scope="col" style="text-align:left">
+                <form th:method="GET" th:action="@{/accounts/all-accounts/{id}/{idAcc}/account-history/{full}(id=${bankUser.getId()}, idAcc=${account.getId()}, full='false')}">
+                    <input type="submit" value="GET HISTORY FOR THE LAST MONTH">
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+</div>
+<div>
+    <table>
+        <tr>
+            <td scope="col" style="text-align:left">
+                <form th:method="PUT" th:action="@{/accounts/all-accounts/{id}/{idAcc}/account-history/range(id=${bankUser.getId()}, idAcc=${account.getId()})}" th:object="${historyRange}">
+                    <input type="date" th:field="*{start}" th:required="required">
+                    <input type="date" th:field="*{end}" th:required="required">
+                    <input type="submit" value="GET RANGE HISTORY">
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<p>
+<div th:each="accountHistoryRow : ${accountHistory}">
+    <span><b>FROM</b>: </span>
+    <span th:text="${accountHistoryRow.getSrcNumber()}">srcNumber</span>
+    <span><b>TO</b>: </span>
+    <span th:text="${accountHistoryRow.getDstNumber}">dstNumber</span>
+    <span> <b>AMOUNT</b>: </span>
+    <span th:text="${accountHistoryRow.getAmount()}">amount</span>
+    <span> <b>PURPOSE</b>: </span>
+    <span th:text="${accountHistoryRow.getPurpose()}">purpose</span>
+    <span> <b>STATE</b>: </span>
+    <span th:text="${accountHistoryRow.getState()}">state</span>
+</div>
+</p>
+<table>
+    <tr>
+        <td scope="col" style="text-align:left">
+            <form th:method="GET" th:action="@{/users/{id}(id=${bankUser.getId()})}">
+                <input type="submit" value="CLIENT">
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td scope="col" style="text-align:left">
+            <form th:method="GET" th:action="@{/accounts/all-accounts/{id}/{idAcc}(id=${bankUser.getId()}, idAcc=${account.getId()})}">
+                <input type="submit" value="ACCOUNT">
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td scope="col" style="text-align:left">
+            <form th:method="GET" th:action="@{/accounts/accounts-info/{id}(id=${bankUser.getId()})}">
+                <input type="submit" value="CLIENT ACCOUNTS INFO">
+            </form>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
