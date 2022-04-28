@@ -84,7 +84,7 @@
                 </tr>
                 <tr>
                     <td scope="col" style="text-align:center">
-                        <form th:method="GET" th:action="@{/accounts/accounts-for{id}(id=${bankUser.getId()})}">
+                        <form th:method="GET" th:action="@{/accounts/accounts-info/{id}(id=${bankUser.getId()})}">
                             <input type="submit" value="USER ACCOUNTS">
                         </form>
                     </td>

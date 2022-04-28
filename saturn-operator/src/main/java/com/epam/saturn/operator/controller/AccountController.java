@@ -4,6 +4,8 @@ import com.epam.saturn.operator.dao.Account;
 import com.epam.saturn.operator.dao.TransactionType;
 import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.dto.AccountDto;
+import com.epam.saturn.operator.dto.TimeRange;
+import com.epam.saturn.operator.dto.TransactionHistoryDto;
 import com.epam.saturn.operator.dto.TransactionDto;
 import com.epam.saturn.operator.repository.AccountRepository;
 import com.epam.saturn.operator.service.TransactionService;
@@ -41,20 +43,27 @@ public class AccountController {
     private final String ATTRIBUTE_ACCOUNTS = "accounts";
     private final String ATTRIBUTE_ACCOUNT = "account";
     private final String ATTRIBUTE_NO_ACCOUNT = "noAccount";
+    private final String ATTRIBUTE_ACCOUNT_HISTORY = "accountHistory";
+    private final String ATTRIBUTE_HISTORY_PERIOD = "fullHistoryPeriod";
+    private final String ATTRIBUTE_HISTORY_RANGE = "historyRange";
 
     private final String REDIRECT_USERS = "redirect:/users/";
-    private final String REDIRECT_ACTIVE_USER_ACCOUNTS = "redirect:/accounts/active-accounts-for";
-    private final String REDIRECT_ADD_ACCOUNT = "redirect:/add-account-for";
+    private final String REDIRECT_ACTIVE_USER_ACCOUNTS = "redirect:/accounts/active-accounts/";
+    private final String REDIRECT_ADD_ACCOUNT = "redirect:/add-account/";
 
     private final String TEMPLATE_LIST_OF_ACCOUNTS_ALL_USERS = "accounts/listOfAccounts";
     private final String TEMPLATE_USER_ACCOUNTS = "accounts/userAccounts";
     private final String TEMPLATE_USER_ACCOUNT = "accounts/userAccount";
     private final String TEMPLATE_LIST_OF_USER_ACCOUNTS = "accounts/userAccountsAll";
     private final String TEMPLATE_OPEN_NEW_ACCOUNT = "accounts/openNewAccount";
+    private final String TEMPLATE_ACCOUNT_TRANSACTIONS_HISTORY = "accounts/accountHistory";
 
 
     @Autowired
-    public AccountController(AccountService accountService, UserService userService, AccountRepository accountRepository, TransactionService transactionService) {
+    public AccountController(AccountService accountService,
+                             UserService userService,
+                             AccountRepository accountRepository,
+                             TransactionService transactionService) {
         this.accountService = accountService;
         this.userService = userService;
         this.accountRepository = accountRepository;
@@ -70,12 +79,12 @@ public class AccountController {
         return TEMPLATE_LIST_OF_ACCOUNTS_ALL_USERS;
     }
 
-    @GetMapping("/accounts-for{id}")
+    @GetMapping("/accounts-info/{id}")
     public String showUserAccountsForm(@PathVariable("id") Long id, Model model) {
         return tryAddUserToModel(id, model).orElse(TEMPLATE_USER_ACCOUNTS);
     }
 
-    @GetMapping("/all-accounts-for{id}")
+    @GetMapping("/all-accounts/{id}")
     public String showUserAccountsAll(@PathVariable("id") Long id, Model model) {
         final Optional<String> errResponse = tryAddUserToModel(id, model);
         if (errResponse.isPresent()) {
@@ -88,7 +97,7 @@ public class AccountController {
         return TEMPLATE_LIST_OF_USER_ACCOUNTS;
     }
 
-    @GetMapping("/all-accounts-for{id}/{idAcc}")
+    @GetMapping("/all-accounts/{id}/{idAcc}")
     public String showUserAccount(@PathVariable("id") Long id, @PathVariable("idAcc") Long idAcc, Model model) {
         final Optional<String> errResponse = tryAddUserToModel(id, model);
         if (errResponse.isPresent()) {
@@ -105,7 +114,7 @@ public class AccountController {
         return "transactions/hello";
     }
 
-    @PutMapping("/all-accounts-for{id}/{idAcc}")
+    @PutMapping("/all-accounts/{id}/{idAcc}")
     public String setAccountDefault(@PathVariable("id") Long id, @PathVariable("idAcc") Long idAcc, Model model) {
         final Optional<String> errResponse = tryAddUserToModel(id, model);
         if (errResponse.isPresent()) {
@@ -119,9 +128,9 @@ public class AccountController {
         return TEMPLATE_USER_ACCOUNT;
     }
 
-    @DeleteMapping("/all-accounts-for{id}/{idAcc}")
+    @DeleteMapping("/all-accounts/{id}/{idAcc}")
     public String deleteUserAccount(@PathVariable("id") Long id, @PathVariable("idAcc") Long idAcc, Model model) {
-        Optional<Account> accountOptional = accountService.getAccount(idAcc);
+        Optional<Account> accountOptional = accountService.findAccountByAccountId(idAcc);
         if (accountOptional.isEmpty()) {
             model.addAttribute(ATTRIBUTE_NO_ACCOUNT, Boolean.TRUE);
             return TEMPLATE_USER_ACCOUNT;
@@ -130,7 +139,7 @@ public class AccountController {
         return REDIRECT_ACTIVE_USER_ACCOUNTS + id;
     }
 
-    @GetMapping("/active-accounts-for{id}")
+    @GetMapping("/active-accounts/{id}")
     public String showUserAccountsActive(@PathVariable("id") Long id, Model model) {
         final Optional<String> errResponse = tryAddUserToModel(id, model);
         if (errResponse.isPresent()) {
@@ -143,12 +152,47 @@ public class AccountController {
         return TEMPLATE_LIST_OF_USER_ACCOUNTS;
     }
 
-    @GetMapping("/add-account-for{id}")
+    @GetMapping("/add-account/{id}")
     public String showOpenAccountForm(@PathVariable("id") Long id, Model model) {
         return tryAddUserToModel(id, model).orElse(TEMPLATE_OPEN_NEW_ACCOUNT);
     }
 
-    @PostMapping("/add-account-for{id}")
+    @GetMapping("/all-accounts/{id}/{idAcc}/account-history/{full}")
+    public String showAccountHistory(@PathVariable("id") Long id,
+                                     @PathVariable("idAcc") Long idAcc,
+                                     @PathVariable Boolean full,
+                                     @ModelAttribute("historyRange") TimeRange range,
+                                     Model model) {
+        final Optional<String> errResponse = tryAddUserToModel(id, model);
+        if (errResponse.isPresent()) {
+            return errResponse.get();
+        }
+        addAccountToModel(idAcc, model);
+        model.addAttribute(ATTRIBUTE_HISTORY_PERIOD, full);
+        Account account = (Account) model.getAttribute(ATTRIBUTE_ACCOUNT);
+        List<TransactionHistoryDto> transactionDtoList = accountService.getAccountTransactionsHistory(account, full);
+        model.addAttribute(ATTRIBUTE_ACCOUNT_HISTORY, transactionDtoList);
+        return TEMPLATE_ACCOUNT_TRANSACTIONS_HISTORY;
+    }
+
+    @PutMapping("/all-accounts/{id}/{idAcc}/account-history/range")
+    public String showAccountHistoryForTimeRange(@PathVariable("id") Long id,
+                                                 @PathVariable("idAcc") Long idAcc,
+                                                 @ModelAttribute("historyRange") TimeRange range,
+                                                 Model model) {
+        final Optional<String> errResponse = tryAddUserToModel(id, model);
+        if (errResponse.isPresent()) {
+            return errResponse.get();
+        }
+        addAccountToModel(idAcc, model);
+        model.addAttribute(ATTRIBUTE_HISTORY_PERIOD, null);
+        Account account = (Account) model.getAttribute(ATTRIBUTE_ACCOUNT);
+        List<TransactionHistoryDto> transactionDtoList = accountService.getAccountTransactionsHistoryForTimeRange(account, range);
+        model.addAttribute(ATTRIBUTE_ACCOUNT_HISTORY, transactionDtoList);
+        return TEMPLATE_ACCOUNT_TRANSACTIONS_HISTORY;
+    }
+
+    @PostMapping("/add-account/{id}")
     public String openAccount(@PathVariable("id") Long id,
                               @ModelAttribute("accountDto") AccountDto accountDto,
                               BindingResult bindingResult,
@@ -157,7 +201,6 @@ public class AccountController {
         if (errResponse.isPresent()) {
             return errResponse.get();
         }
-
         if (bindingResult.hasErrors()) {
             return REDIRECT_ADD_ACCOUNT + id;
         }
@@ -197,8 +240,13 @@ public class AccountController {
         return new AccountDto();
     }
 
+    @ModelAttribute("historyRange")
+    public TimeRange getDefaultTimeRange() {
+        return new TimeRange();
+    }
+
     private void addAccountToModel(Long idAcc, Model model) {
-        Optional<Account> accountOptional = accountService.getAccount(idAcc);
+        Optional<Account> accountOptional = accountService.findAccountByAccountId(idAcc);
         if (accountOptional.isPresent()) {
             model.addAttribute(ATTRIBUTE_ACCOUNT, accountOptional.get());
         } else {

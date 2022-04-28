@@ -1,7 +1,5 @@
 package com.epam.saturn.operator.dto;
 
-import com.epam.saturn.operator.dao.AccountCoin;
-import com.epam.saturn.operator.dao.AccountType;
 import lombok.Builder;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -10,6 +8,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -17,11 +16,13 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @ToString
-public class AccountDto {
+public class TransactionHistoryDto {
 
-    private Long userId;
-    private Boolean isDefault;
-    private AccountType type;
-    private AccountCoin coin;
-    private BigDecimal percent;
+    private Long id;
+    private String srcNumber;
+    private String dstNumber;
+    private BigDecimal amount;
+    private String purpose;
+    private LocalDateTime dateTime;
+    private String state;
 }

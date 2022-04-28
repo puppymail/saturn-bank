@@ -45,24 +45,24 @@
 </p>
 <table>
     <td scope="col" style="text-align:left">
-        <form th:method="GET" th:action="@{/accounts/all-accounts-for{id}(id=${bankUser.getId()})}">
+        <form th:method="GET" th:action="@{/accounts/all-accounts/{id}(id=${bankUser.getId()})}">
             <input type="submit" value="SHOW ALL ACCOUNTS">
         </form>
     </td>
     <td scope="col" style="text-align:left">
-        <form th:method="GET" th:action="@{/accounts/active-accounts-for{id}(id=${bankUser.getId()})}">
+        <form th:method="GET" th:action="@{/accounts/active-accounts/{id}(id=${bankUser.getId()})}">
             <input type="submit" value="SHOW ACTIVE ACCOUNTS">
         </form>
     </td>
     <td scope="col" style="text-align:left">
-        <form th:method="GET" th:action="@{/accounts/add-account-for{id}(id=${bankUser.getId()})}">
+        <form th:method="GET" th:action="@{/accounts/add-account/{id}(id=${bankUser.getId()})}">
             <input type="submit" value="OPEN NEW ACCOUNT">
         </form>
     </td>
     <tr>
         <td scope="col" style="text-align:left">
             <form th:method="GET" th:action="@{/users/{id}(id=${bankUser.getId()})}">
-                <input type="submit" value="BACK TO USER">
+                <input type="submit" value="CLIENT">
             </form>
         </td>
     </tr>
