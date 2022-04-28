@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 
 //This is test controller for card, will be deleted
@@ -36,41 +37,38 @@ public class CardController {
     }
 
     @GetMapping("/issue-card-for&account-number={accountNumber}&user-id={userId}")
+    @ResponseBody
     public String issueCard(@PathVariable String accountNumber, @PathVariable long userId) {
         Account account = accountRepository.findByNumber(accountNumber)
                 .orElseThrow(() -> new IllegalArgumentException(NO_ACCOUNT_WITH_THIS_NUMBER));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(NO_USER_WITH_THIS_ID));
         Card card = cardService.issueCard(account, user);
-        return "redirect:/cards";
+        return "Card was issued: " + card;
     }
 
-    @GetMapping("change-pincode-by-operator")
-    public String changePinCodeByOperator(){
-        String cardNumber = cardRepository.findAll()
-                .stream()
-                .findAny()
-                .orElseThrow()
-                .getNumber();
+    @GetMapping("change-pincode-by-operator&card-number={cardNumber}")
+    @ResponseBody
+    public String changePinCodeByOperator(@PathVariable String cardNumber){
         cardService.changePinCodeByOperator(cardNumber);
-        return "redirect:/cards";
+        Card card = cardRepository.findByNumber(cardNumber).orElseThrow();
+        return "Pincode was changed at card: " + card;
     }
 
-    @GetMapping("change-pincode-by-client&old-pincode={oldPinCode}&new-pincode={newPinCode}")
-    public String changePinCodeByClient(@PathVariable String oldPinCode, @PathVariable String newPinCode){
-        Card card = cardRepository.findAll()
-                .stream()
-                .findAny()
-                .orElseThrow();
-        cardService.changePinCodeByClient(card.getNumber(), oldPinCode, newPinCode);
-        return "redirect:/cards";
+    @GetMapping("change-pincode-by-client&card-number={cardNumber}&old-pincode={oldPinCode}&new-pincode={newPinCode}")
+    @ResponseBody
+    public String changePinCodeByClient(@PathVariable String cardNumber, @PathVariable String oldPinCode, @PathVariable String newPinCode){
+        cardService.changePinCodeByClient(cardNumber, oldPinCode, newPinCode);
+        Card card = cardRepository.findByNumber(cardNumber).orElseThrow();
+        return "Pincode was changed at card: " + card;
     }
 
     //test method for soft-deleting row from DB
-    @GetMapping("delete")
-    public String remove() {
-        Card card = cardRepository.findAll().stream().findFirst().orElseThrow();
-        cardRepository.delete(card);
-        return "redirect:/cards";
+    @GetMapping("close&card-number={cardNumber}")
+    @ResponseBody
+    public String close(@PathVariable String cardNumber) {
+        Card card = cardRepository.findByNumber(cardNumber).orElseThrow();
+        cardService.closeCard(card);
+        return card + " was closed";
     }
 }
