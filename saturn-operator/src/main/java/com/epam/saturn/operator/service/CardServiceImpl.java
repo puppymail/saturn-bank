@@ -84,8 +84,9 @@ public class CardServiceImpl implements CardService {
             existingCard.setPinCode(generatePinCode());
             cardRepository.save(existingCard);
             log.info("Card pincode was changed at card with number: " + existingCard.getNumber());
+        } else {
+            throw new IllegalArgumentException("card number didn't pass validation");
         }
-        throw new IllegalArgumentException("card number didn't pass validation");
     }
 
     @Override
@@ -97,8 +98,9 @@ public class CardServiceImpl implements CardService {
             existingCard.setPinCode(newPinCode);
             cardRepository.save(existingCard);
             log.info("Card pincode was changed at card with number: " + existingCard.getNumber());
+        } else {
+            throw new IllegalArgumentException("card number didn't pass validation");
         }
-        throw new IllegalArgumentException("card number didn't pass validation");
     }
 
     private String generatePinCode() {
