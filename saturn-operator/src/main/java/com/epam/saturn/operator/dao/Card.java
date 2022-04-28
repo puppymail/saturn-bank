@@ -2,6 +2,7 @@ package com.epam.saturn.operator.dao;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
+@ToString
 @Table(name = "card")
 @SQLDelete(sql = "UPDATE saturn_bank.card SET is_deleted = true WHERE id=?")
 @Where(clause = "is_deleted=false")
@@ -45,9 +47,11 @@ public class Card implements SoftDeleteEntity {
     @Column(name = "valid_till")
     private LocalDate validTill;
 
+    @ToString.Exclude
     @Column(name = "pincode")
     private String pinCode;
 
+    @ToString.Exclude
     @Column(name = "cvv2")
     private String cvv2;
 
