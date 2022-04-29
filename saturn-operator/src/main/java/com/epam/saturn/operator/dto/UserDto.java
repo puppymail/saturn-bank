@@ -23,6 +23,7 @@ public class UserDto {
     private String lastModified;
     private String type;
     private String role;
+    private String password;
     private boolean isDeleted;
 
 }

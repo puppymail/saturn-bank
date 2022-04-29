@@ -1,54 +1,59 @@
 package com.epam.saturn.operator.controller;
 
+import static java.time.LocalDate.parse;
+import static java.time.LocalDateTime.now;
+import static java.util.Objects.requireNonNull;
+
 import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.dao.UserRole;
 import com.epam.saturn.operator.dao.UserType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
-import java.io.InputStream;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-
-import java.util.Properties;
 import java.util.function.Supplier;
 
 @Slf4j
 @Component
+@PropertySource("classpath:defaultUserData.properties")
 public class DefaultUserSupplier implements Supplier<User> {
 
-    private static final String DEFAULT_USER_DATA_PROPERTIES = "defaultUserData.properties";
+    private static final String FIRST_NAME_PROP_NAME = "firstName";
+    private static final String LAST_NAME_PROP_NAME = "lastName";
+    private static final String MIDDLE_NAME_PROP_NAME = "middleName";
+    private static final String PHONE_NUMBER_PROP_NAME = "phoneNumber";
+    private static final String EMAIL_PROP_NAME = "email";
+    private static final String BIRTH_DATE_PROP_NAME = "birthDate";
+    private static final String PASSWORD_PROP_NAME = "password";
+    private static final String TYPE_PROP_NAME = "type";
+    private static final String ROLE_PROP_NAME = "role";
+
+    @Autowired
+    Environment env;
+
+    LocalDateTime now;
 
     @Override
     public User get() {
-        User user = new User();
-        Properties userTestData = new Properties();
-        try (
-                InputStream propsFileStream = getClass()
-                        .getClassLoader()
-                        .getResourceAsStream(DEFAULT_USER_DATA_PROPERTIES)
-        ) {
-            userTestData.load(propsFileStream);
-        }
-        catch (IOException e) {
-            log.error("!Couldn't load default user data!");
-            e.printStackTrace();
-        }
+        now = now();
 
-        user.setFirstName(userTestData.getProperty("firstName"));
-        user.setLastName(userTestData.getProperty("lastName"));
-        user.setMiddleName(userTestData.getProperty("middleName"));
-        user.setPhoneNumber(userTestData.getProperty("phoneNumber"));
-        user.setEmail(userTestData.getProperty("email"));
-        user.setBirthDate(LocalDate.parse(userTestData.getProperty("dateOfBirth")));
-        user.setRegistrationDate(LocalDateTime.now());
-        user.setLastLogin(user.getRegistrationDate());
-        user.setType(UserType.valueOf(userTestData.getProperty("type")));
-        user.setRole(UserRole.valueOf(userTestData.getProperty("role")));
-
-        return user;
+        return User.builder()
+                .firstName(env.getProperty(FIRST_NAME_PROP_NAME))
+                .lastName(env.getProperty(LAST_NAME_PROP_NAME))
+                .middleName(env.getProperty(MIDDLE_NAME_PROP_NAME))
+                .phoneNumber(env.getProperty(PHONE_NUMBER_PROP_NAME))
+                .email(env.getProperty(EMAIL_PROP_NAME))
+                .birthDate(parse(requireNonNull(env.getProperty(BIRTH_DATE_PROP_NAME))))
+                .registrationDate(now)
+                .lastModified(now)
+                .lastLogin(now)
+                .password(env.getProperty(PASSWORD_PROP_NAME))
+                .type(UserType.valueOf(env.getProperty(TYPE_PROP_NAME)))
+                .role(UserRole.valueOf(env.getProperty(ROLE_PROP_NAME)))
+                .build();
     }
 
 

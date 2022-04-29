@@ -7,8 +7,8 @@ import static org.springframework.util.ReflectionUtils.invokeMethod;
 import static org.springframework.util.StringUtils.capitalize;
 
 import com.epam.saturn.operator.dao.SoftDeleteEntity;
-import com.epam.saturn.operator.service.exceptions.DeletedEntityException;
-import com.epam.saturn.operator.service.exceptions.NoSuchEntityException;
+import com.epam.saturn.operator.exception.DeletedEntityException;
+import com.epam.saturn.operator.exception.NoSuchEntityException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;

@@ -12,8 +12,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 
 import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.repository.UserRepository;
-import com.epam.saturn.operator.service.exceptions.EntityAlreadyPresentException;
-import com.epam.saturn.operator.service.exceptions.NoSuchEntityException;
+import com.epam.saturn.operator.exception.EntityAlreadyPresentException;
+import com.epam.saturn.operator.exception.NoSuchEntityException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Example;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,9 @@ public class UserServiceTest {
 
     @Mock
     UserRepository userRepository;
+
+    @Mock
+    PasswordEncoder encoder;
 
     UserService userService;
 

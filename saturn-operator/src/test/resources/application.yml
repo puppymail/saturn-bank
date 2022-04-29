@@ -12,6 +12,10 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: false
+  security:
+    user:
+      name: admin
+      password: admin
   flyway:
     schemas: saturn_bank
   h2:

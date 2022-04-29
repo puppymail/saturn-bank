@@ -1,6 +1,5 @@
 package com.epam.saturn.operator.service.user;
 
-import com.epam.saturn.operator.dao.Card;
 import com.epam.saturn.operator.dao.User;
 import com.epam.saturn.operator.dao.UserRole;
 import com.epam.saturn.operator.dao.UserType;
@@ -20,12 +19,6 @@ public interface UserService {
     void editUser(User newUser, Long id);
 
     void editUser(User newUser, User oldUser);
-
-    Boolean logIn(User user);
-
-    Boolean logIn(Card card);
-
-    void logOut(User user);
 
     List<User> findAll();
 
@@ -49,6 +42,6 @@ public interface UserService {
 
     Optional<User> findByPhoneNumber(String phoneNumber);
 
-    List<User> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
 }

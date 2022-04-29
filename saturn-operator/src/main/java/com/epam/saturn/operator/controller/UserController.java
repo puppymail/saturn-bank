@@ -1,5 +1,6 @@
 package com.epam.saturn.operator.controller;
 
+import static com.epam.saturn.operator.controller.ControllerConstants.REDIRECT;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
@@ -35,6 +36,16 @@ import java.util.function.Supplier;
 @RequestMapping("/users")
 public class UserController {
 
+    private static final String USER_NAMESPACE = "user";
+    private static final String USERS_PAGE = "/users";
+    private static final String USER_PAGE = "/user";
+    private static final String EDIT_USER_PAGE = "/editUser";
+    private static final String ADD_USER_PAGE = "/addUser";
+
+    private static final String PARAM_SHOW_USERS_ALL = "all";
+    private static final String PARAM_SHOW_USERS_DELETED = "deleted";
+    private static final String PARAM_SHOW_USERS_ACTIVE = "active";
+
     private final UserService userService;
     private final AccountRepository accountRepo;
 
@@ -57,25 +68,22 @@ public class UserController {
     }
 
     @GetMapping()
-    public String showUsers(@RequestParam(name = "show", required = false) String show, Model model) {
+    public String showUsers(@RequestParam(name = "show", defaultValue = PARAM_SHOW_USERS_ACTIVE) String show,
+                            Model model) {
         List<User> users;
-        if (isNull(show)) {
-            users = userService.findAll(Boolean.FALSE);
+        if (show.equals(PARAM_SHOW_USERS_ALL)) {
+            users = userService.findAll();
+        } else if (show.equals(PARAM_SHOW_USERS_DELETED)) {
+            users = userService.findAll(Boolean.TRUE);
         } else {
-            if (show.equals("all")) {
-                users = userService.findAll();
-            } else if (show.equals("deleted")) {
-                users = userService.findAll(Boolean.TRUE);
-            } else {
-                users = userService.findAll(Boolean.FALSE);
-            }
+            users = userService.findAll(Boolean.FALSE);
         }
         List<UserDto> usersDto = users.stream()
                         .map(mapper::userToDto)
                         .collect(toList());
         model.addAttribute("bankUsers", usersDto);
 
-        return "user/users";
+        return USER_NAMESPACE + USERS_PAGE;
     }
 
     @GetMapping("/{id}")
@@ -89,7 +97,7 @@ public class UserController {
             log.info("Added user to model.");
         }
 
-        return "user/user";
+        return USER_NAMESPACE + USER_PAGE;
     }
 
     @GetMapping("/{id}/delete")
@@ -103,7 +111,7 @@ public class UserController {
             log.info("Added user to model.");
         }
 
-        return "redirect:/users";
+        return REDIRECT + USERS_PAGE;
     }
 
     @GetMapping("/{id}/edit")
@@ -117,7 +125,7 @@ public class UserController {
             log.info("Added user to model.");
         }
 
-        return "user/editUser";
+        return USER_NAMESPACE + EDIT_USER_PAGE;
     }
 
     @GetMapping("/add-default")
@@ -126,7 +134,7 @@ public class UserController {
         userService.createUser(user);
         log.info("Redirecting to \"/users\"");
 
-        return "redirect:/users";
+        return REDIRECT + USERS_PAGE;
     }
 
     @GetMapping("/add-random")
@@ -143,7 +151,7 @@ public class UserController {
         model.addAttribute("bankUser", new UserDto());
         log.info("Displaying \"add-user\" page.");
 
-        return "user/addUser";
+        return USER_NAMESPACE + ADD_USER_PAGE;
     }
 
     @PostMapping()
@@ -151,7 +159,7 @@ public class UserController {
         userService.createUser(mapper.dtoToUser(bankUserDto));
         log.info("Redirecting to \"/users\"");
 
-        return "redirect:/users";
+        return REDIRECT + USERS_PAGE;
     }
 
     @PutMapping("/{id}")
@@ -159,7 +167,7 @@ public class UserController {
         userService.editUser(mapper.dtoToUser(bankUserDto), id);
         log.info("Redirecting to \"/users/" + id + "\"");
 
-        return "redirect:/users/" + id;
+        return REDIRECT + USERS_PAGE + "/" + id;
     }
 
     @DeleteMapping("/{id}")
@@ -167,7 +175,7 @@ public class UserController {
         userService.deleteUser(id);
         log.info("Redirecting to \"/users\"");
 
-        return "redirect:/users";
+        return REDIRECT + USERS_PAGE;
     }
 
     @GetMapping("/add-default-account")
@@ -187,7 +195,7 @@ public class UserController {
         log.info("Default account inserted in \"account\" table belonging to user id=" + account.getUser().getId());
         log.info("Redirecting to \"/users\"");
 
-        return "redirect:/users";
+        return REDIRECT + USERS_PAGE;
     }
 
     @GetMapping("/clear-all")
@@ -199,7 +207,7 @@ public class UserController {
         log.info("Cleared all records from \"bank_user\" table.");
         log.info("Redirecting to \"/users\"");
 
-        return "redirect:/users";
+        return REDIRECT + USERS_PAGE;
     }
 
 }
