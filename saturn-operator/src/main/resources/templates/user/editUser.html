@@ -9,35 +9,35 @@
         <h4>Add user</h4>
         <form th:method="PUT" th:action="@{/users/{id}(id=${bankUser.getId()})}" th:object="${bankUser}">
             <label for="firstName">Enter first name:</label>
-            <input type="text" th:field="*{firstName}" id="firstName" value="First name">
+            <input type="text" th:field="*{firstName}" id="firstName">
             <br/>
             <label for="lastName">Enter last name:</label>
-            <input type="text" th:field="*{lastName}" id="lastName" value="Last name">
+            <input type="text" th:field="*{lastName}" id="lastName">
             <br/>
             <label for="middleName">Enter middle name (not required):</label>
             <input type="text" th:field="*{middleName}" id="middleName">
             <br/>
             <label for="birthDate">Enter date of birth:</label>
-            <input type="date" th:field="*{birthDate}" id="birthDate" value="2000-01-01">
+            <input type="date" th:field="*{birthDate}" id="birthDate">
             <br/>
             <label for="phoneNumber">Enter phone number:</label>
-            <input type="text" th:field="*{phoneNumber}" id="phoneNumber" value="+18000000000">
+            <input type="text" th:field="*{phoneNumber}" id="phoneNumber">
             <br/>
             <label for="email">Enter email:</label>
-            <input type="text" th:field="*{email}" id="email" value="example@mailservice.com">
+            <input type="text" th:field="*{email}" id="email">
             <br/>
 <!--            TODO change radio buttons to drop-down lists and pull types/roles from db tables-->
             <p>Select type:</p>
             <div>
                 <label for="type_client"><b>CLIENT</b></label>
-                <input type="radio" th:field="*{type}" id="type_client" name="type" value="CLIENT" checked>
+                <input type="radio" th:field="*{type}" id="type_client" name="type" value="CLIENT">
                 <label for="type_employee"><b>EMPLOYEE</b></label>
                 <input type="radio" th:field="*{type}" id="type_employee" name="type" value="EMPLOYEE">
             </div>
             <p>Select role:</p>
             <div>
                 <label for="role_client"><b>CLIENT</b></label>
-                <input type="radio" th:field="*{role}" id="role_client" name="role" value="CLIENT" checked>
+                <input type="radio" th:field="*{role}" id="role_client" name="role" value="CLIENT">
                 <label for="role_operator"><b>OPERATOR</b></label>
                 <input type="radio" th:field="*{role}" id="role_operator" name="role" value="OPERATOR">
                 <label for="role_admin"><b>ADMIN</b></label>

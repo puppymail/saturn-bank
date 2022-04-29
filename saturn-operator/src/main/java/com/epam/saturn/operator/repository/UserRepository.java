@@ -26,6 +26,6 @@ public interface UserRepository extends JpaRepository<User, Long>, SoftDeleteEnt
 
     Optional<User> findByPhoneNumber(String phoneNumber);
 
-    List<User> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
 }

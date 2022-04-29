@@ -8,6 +8,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -22,6 +24,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -33,7 +37,7 @@ import java.util.List;
 @Entity
 @SQLDelete(sql = "UPDATE saturn_bank.bank_user SET is_deleted=TRUE, last_modified=DEFAULT WHERE id=?")
 @Table(name = "bank_user")
-public class User implements SoftDeleteEntity {
+public class User implements SoftDeleteEntity, UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -82,8 +86,41 @@ public class User implements SoftDeleteEntity {
     @Column(name = "role", nullable = false)
     private UserRole role;
 
+    @Column(name = "password", nullable = false)
+    private String password;
+
     @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = Boolean.FALSE;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(role.getAuthority());
+    }
+
+    @Override
+    public String getUsername() {
+        return phoneNumber;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return !isDeleted;
+    }
 
 }

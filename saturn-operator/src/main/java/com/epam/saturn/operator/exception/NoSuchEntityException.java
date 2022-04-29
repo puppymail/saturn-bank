@@ -1,4 +1,4 @@
-package com.epam.saturn.operator.service.exceptions;
+package com.epam.saturn.operator.exception;
 
 public class NoSuchEntityException extends RuntimeException {
 
