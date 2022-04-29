@@ -7,6 +7,7 @@ CREATE TABLE card
     percent numeric(20,2),
     type int,
     pincode int,
+    cvv2 int,
     FOREIGN KEY (user_id) REFERENCES bank_user(id),
     FOREIGN KEY (account_id) REFERENCES account(id)
 );
