@@ -8,7 +8,7 @@
         <version>2.6.6</version>
         <relativePath/>
     </parent>
-    <groupId>com.epam.saturn</groupId>
+    <groupId>com.saturn_bank</groupId>
     <artifactId>saturn-operator</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>saturn-operator</name>
