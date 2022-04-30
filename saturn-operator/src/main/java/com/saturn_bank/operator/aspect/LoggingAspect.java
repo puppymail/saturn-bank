@@ -18,8 +18,8 @@ public class LoggingAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Pointcut("execution(* com.epam.saturn.operator.controller..*(..)) ||" +
-            "execution(* com.epam.saturn.operator.service..*(..))")
+    @Pointcut("execution(* com.saturn_bank.operator.controller..*(..)) ||" +
+            "execution(* com.saturn_bank.operator.service..*(..))")
     public void applicationPackagePointcut() {}
 
     @Pointcut("execution(* org.springframework.data.repository.Repository+.*(..))")

@@ -20,4 +20,4 @@ spring:
         enabled: true
 logging:
   level:
-    com.epam.saturn.operator: DEBUG
+    com.saturn_bank.operator: DEBUG
