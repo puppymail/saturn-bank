@@ -16,7 +16,6 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@PropertySource("classpath:adminData.properties")
 public class UserAuthServiceImpl implements UserAuthService {
 
     private final UserRepository userRepository;
