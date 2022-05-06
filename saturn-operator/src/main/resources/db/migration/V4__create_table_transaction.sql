@@ -7,6 +7,6 @@ CREATE TABLE transaction (
     state int,
     date_time timestamp,
     PRIMARY KEY (id),
-    FOREIGN KEY (account_src) REFERENCES account(id),
-    FOREIGN KEY (account_dst) REFERENCES account(id)
+    CONSTRAINT fk_transaction_account_src FOREIGN KEY (account_src) REFERENCES account(id),
+    CONSTRAINT fk_transaction_account_dst FOREIGN KEY (account_dst) REFERENCES account(id)
 );
