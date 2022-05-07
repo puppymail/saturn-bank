@@ -22,6 +22,10 @@ import java.lang.annotation.Target;
 @Repeatable(Password.List.class)
 public @interface Password {
 
+    int minLength() default 1;
+
+    int maxLength() default 32;
+
     String message() default "{com.saturn_bank.operator.constraints.Password.message}";
 
     Class<?>[] groups() default { };
