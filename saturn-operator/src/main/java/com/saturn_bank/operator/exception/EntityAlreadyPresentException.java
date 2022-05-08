@@ -1,6 +1,6 @@
 package com.saturn_bank.operator.exception;
 
-public class EntityAlreadyPresentException extends RuntimeException {
+public class EntityAlreadyPresentException extends Exception {
 
     public EntityAlreadyPresentException() {
         super();

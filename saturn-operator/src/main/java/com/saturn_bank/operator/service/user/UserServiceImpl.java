@@ -1,10 +1,11 @@
 package com.saturn_bank.operator.service.user;
 
-import static com.saturn_bank.operator.exception.ErrorMessages.ENTITY_ALREADY_PRESENT_EX;
-import static com.saturn_bank.operator.exception.ErrorMessages.INVALID_ID_PROVIDED_EX;
-import static com.saturn_bank.operator.exception.ErrorMessages.NO_PASSWORD_SET_EX;
-import static com.saturn_bank.operator.exception.ErrorMessages.NO_SUCH_ENTITY_EX;
-import static com.saturn_bank.operator.exception.ErrorMessages.NULL_PTR_EX;
+import static com.saturn_bank.operator.constraints.RegEx.IS_EMAIL_REGEX;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.ENTITY_ALREADY_PRESENT_EX_MSG;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.INVALID_ID_PROVIDED_EX_MSG;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NO_PASSWORD_SET_EX_MSG;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NO_SUCH_ENTITY_EX_MSG;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NULL_PTR_EX_MSG;
 import static java.time.LocalDateTime.now;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.isNull;
@@ -19,6 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,26 +36,28 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final PasswordEncoder encoder;
+
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder encoder) {
         this.userRepository = userRepository;
+        this.encoder = encoder;
     }
 
     @Transactional
     @Override
-    public User createUser(User user) {
+    public User createUser(User user) throws EntityAlreadyPresentException {
         if (nonNull(user.getId()) && userRepository.existsById(user.getId())) {
             log.error("!User with provided id=" + user.getId() + " already exists!");
-            throw new EntityAlreadyPresentException(ENTITY_ALREADY_PRESENT_EX + user.getId());
+            throw new EntityAlreadyPresentException(ENTITY_ALREADY_PRESENT_EX_MSG + user.getId());
         }
-        if (isNull(user.getPassword()) || user.getPassword().isBlank()) {
+        String rawPassword = user.getPassword();
+        if (isNull(rawPassword) || rawPassword.isBlank()) {
             log.error("!No password set for provided user!");
-            throw new IllegalArgumentException(NO_PASSWORD_SET_EX);
+            throw new IllegalArgumentException(NO_PASSWORD_SET_EX_MSG);
         }
+        user.setPassword(encoder.encode(rawPassword));
         user.setRegistrationDate(now());
-        log.info("User created at: " + user.getRegistrationDate());
-
-        user.setLastLogin(user.getRegistrationDate());
         user.setLastModified(user.getRegistrationDate());
         user.setDeleted(Boolean.FALSE);
 
@@ -70,7 +76,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(User user) {
         Optional<User> existingUser;
         if ( ( existingUser = userRepository.findOne(Example.of(user)) ).isEmpty() ) {
-            log.error(NO_SUCH_ENTITY_EX);
+            log.error(NO_SUCH_ENTITY_EX_MSG);
             return;
         }
         user = existingUser.get();
@@ -87,19 +93,19 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void editUser(User updatedUser, User existingUser) {
+    public void editUser(User updatedUser, User existingUser) throws NoSuchEntityException {
         if (isNull(updatedUser)) {
             log.error("!newUser provided is null!");
-            throw new NullPointerException(NULL_PTR_EX);
+            throw new NullPointerException(NULL_PTR_EX_MSG);
         }
         if (isNull(existingUser)) {
             log.error("!oldUser provided is null!");
-            throw new NullPointerException(NULL_PTR_EX);
+            throw new NullPointerException(NULL_PTR_EX_MSG);
         }
         Optional<User> existingUserOpt;
         if ( ( existingUserOpt = userRepository.findOne(Example.of(existingUser)) ).isEmpty() ) {
             log.error("!No such user found!");
-            throw new NoSuchEntityException(NO_SUCH_ENTITY_EX);
+            throw new NoSuchEntityException(NO_SUCH_ENTITY_EX_MSG);
         }
         if (existingUserOpt.get().isDeleted()) {
             log.warn("!User being edited is marked as deleted!");
@@ -108,14 +114,52 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void editUser(User updatedUser, Long id) {
+    public void editUser(User updatedUser, Long id) throws NoSuchEntityException {
         if (isNull(id) || id <= 0) {
             log.error("!Invalid id provided!");
-            throw new IllegalArgumentException(INVALID_ID_PROVIDED_EX);
+            throw new IllegalArgumentException(INVALID_ID_PROVIDED_EX_MSG);
         }
         User existingUser = new User();
         existingUser.setId(id);
         editUser(updatedUser, existingUser);
+    }
+
+    @Transactional
+    @Override
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+        Optional<User> userOpt;
+        if (login.matches(IS_EMAIL_REGEX)) {
+            userOpt = userRepository.findByEmail(login);
+        }
+        else {
+            userOpt = userRepository.findByPhoneNumber(login);
+        }
+        if (userOpt.isEmpty()) {
+            throw new UsernameNotFoundException("No user found with login: " + login);
+        }
+
+        return userOpt.get();
+    }
+
+    @Transactional
+    @Override
+    public void changePassword(User user, String rawPassword) {
+        Optional<User> userOpt;
+        if ( ( userOpt = userRepository.findOne(Example.of(user)) ).isEmpty() ) {
+            log.error("!No such user found!");
+            return;
+        }
+        User existingUser = userOpt.get();
+        existingUser.setPassword(encoder.encode(rawPassword));
+
+        userRepository.save(existingUser);
+    }
+
+    @Override
+    public void changePassword(Long id, String rawPassword) {
+        changePassword(User.builder()
+                .id(id)
+                .build(), rawPassword);
     }
 
     @Override
@@ -124,7 +168,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAll(Boolean isDeleted) { //TODO log refactor
+    public List<User> findAll(Boolean isDeleted) {
         if (isNull(isDeleted)) {
             log.warn("Boolean provided is null, setting it to TRUE!");
             isDeleted = Boolean.TRUE;
@@ -251,7 +295,6 @@ public class UserServiceImpl implements UserService {
         existingUser.setLastModified(now());
 
         userRepository.save(existingUser);
-        log.info("User with id=" + existingUser.getId() + " updated.");
     }
 
     private <T> T getValue(T newValue, T oldValue) {

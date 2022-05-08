@@ -110,7 +110,6 @@ public class TestDataServiceImpl implements TestDataService{
             user.setRole(UserRole.valueOf(Objects.requireNonNull(getChildContent((Element) node, "role")).getTextContent()));
             user.setRegistrationDate(LocalDateTime.now());
             user.setLastModified(user.getRegistrationDate());
-            user.setLastLogin(user.getRegistrationDate());
             users.add(user);
         }
         return users;

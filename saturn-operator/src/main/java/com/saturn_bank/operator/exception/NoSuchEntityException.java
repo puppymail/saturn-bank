@@ -1,8 +1,12 @@
 package com.saturn_bank.operator.exception;
 
-public class NoSuchEntityException extends RuntimeException {
+import lombok.Getter;
+
+@Getter
+public class NoSuchEntityException extends Exception {
 
     public NoSuchEntityException() {
+        super();
     }
 
     public NoSuchEntityException(String message) {
@@ -16,4 +20,5 @@ public class NoSuchEntityException extends RuntimeException {
     public NoSuchEntityException(Throwable cause) {
         super(cause);
     }
+
 }

@@ -7,19 +7,28 @@
     </head>
     <body>
         <h4>Login</h4>
-        <div th:if="${error}">
-            Unable to login. Check your username and password.
+        <div th:if="${param.error}" th:class="error">
+            <p>Invalid credentials provided. Please re-check login and password.</p>
         </div>
-        <form method="POST" th:action="@{/login}" id="loginForm">
-            <label for="phoneNumber">Enter phone number:</label>
-            <input type="text" name="phoneNumber" id="phoneNumber">
+        <div th:if="${param.logout}" th:class="">
+            <p>You have successfully logged out.</p>
+        </div>
+        <form method="POST" th:action="@{/login}" id="loginForm" th:object="${loginForm}">
+            <div th:if="${#fields.hasErrors('login')}">
+                Invalid login.
+            </div>
+            <label for="login">Enter phone number or email:</label>
+            <input type="text" name="login" id="login" th:field="*{login}">
             <br/>
+            <div th:if="${#fields.hasErrors('password')}">
+                Invalid password.
+            </div>
             <label for="password">Enter password:</label>
-            <input type="password" name="password" id="password">
+            <input type="password" name="password" id="password" th:field="*{password}">
             <br/>
             <p><input type="submit" value="Login"></p>
         </form>
-        <form methos="GET" th:action="@{/register}" id="registerRef">
+        <form method="GET" th:action="@{/register}" id="registerRef">
             <p><input type="submit" value="Register"></p>
         </form>
     </body>

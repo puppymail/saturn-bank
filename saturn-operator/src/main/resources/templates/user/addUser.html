@@ -8,24 +8,46 @@
     <body>
         <h4>Add user</h4>
         <form th:method="POST" th:action="@{/users}" th:object="${bankUser}">
-            <label for="firstName">Enter first name:</label>
+            <div th:if="${#fields.hasAnyErrors()}" th:class="error">
+                Invalid user details provided. Please fix errors and resubmit:
+                <br/>
+            </div>
+            <label for="firstName">Enter first name:</label><br/>
             <input type="text" th:field="*{firstName}" id="firstName">
             <br/>
-            <label for="lastName">Enter last name:</label>
+            <div th:if="${#fields.hasErrors('firstName')}" th:class="error" th:errors="*{firstName}">
+                Invalid first name.
+            </div>
+            <label for="lastName">Enter last name:</label><br/>
             <input type="text" th:field="*{lastName}" id="lastName">
             <br/>
-            <label for="middleName">Enter middle name (not required):</label>
+            <div th:if="${#fields.hasErrors('lastName')}" th:class="error" th:errors="*{lastName}">
+                Invalid last name.
+            </div>
+            <label for="middleName">Enter middle name (not required):</label><br/>
             <input type="text" th:field="*{middleName}" id="middleName">
             <br/>
-            <label for="birthDate">Enter date of birth:</label>
+            <div th:if="${#fields.hasErrors('middleName')}" th:class="error" th:errors="*{middleName}">
+                Invalid middle name.
+            </div>
+            <label for="birthDate">Enter date of birth:</label><br/>
             <input type="date" th:field="*{birthDate}" id="birthDate">
             <br/>
-            <label for="phoneNumber">Enter phone number:</label>
+            <div th:if="${#fields.hasErrors('birthDate')}" th:class="error" th:errors="*{birthDate}">
+                Invalid birth date.
+            </div>
+            <label for="phoneNumber">Enter phone number:</label><br/>
             <input type="text" th:field="*{phoneNumber}" id="phoneNumber">
             <br/>
-            <label for="email">Enter email:</label>
-            <input type="text" th:field="*{email}" id="email">
+            <div th:if="${#fields.hasErrors('phoneNumber')}" th:class="error" th:errors="*{phoneNumber}">
+                Invalid phone number.
+            </div>
+            <label for="email">Enter email:</label><br/>
+            <input type="email" th:field="*{email}" id="email">
             <br/>
+            <div th:if="${#fields.hasErrors('email')}" th:class="error" th:errors="*{email}">
+                Invalid email.
+            </div>
 <!--            TODO change radio buttons to drop-down lists and pull types/roles from db tables-->
             <p>Select type:</p>
             <div>
@@ -47,7 +69,6 @@
             </div>
             <br/>
             <p><input type="submit" value="Register new user"> <input type="reset" value="Reset"></p>
-
         </form>
     </body>
 </html>

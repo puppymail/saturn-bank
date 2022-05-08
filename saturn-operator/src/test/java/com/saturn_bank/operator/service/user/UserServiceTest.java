@@ -49,7 +49,7 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userRepository);
+        userService = new UserServiceImpl(userRepository, encoder);
         rnd = new Random();
     }
 
@@ -76,9 +76,10 @@ public class UserServiceTest {
     }
 
     @Test
-    void createUser_createRandomUser_saveAndExistsInvoked() {
+    void createUser_createRandomUser_saveAndExistsInvoked() throws EntityAlreadyPresentException {
         int id = rnd.nextInt(userProvider.getUsersSize());
         User user = userProvider.get(id);
+
         userService.createUser(user);
 
         InOrder inOrder = inOrder(userRepository);
@@ -101,7 +102,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void editUser_updateUserById_saveAndFindInvoked() {
+    void editUser_updateUserById_saveAndFindInvoked() throws NoSuchEntityException {
         int id = rnd.nextInt(userProvider.getUsersSize());
         int existingId = rnd.nextInt(userProvider.getUsersSize());
         User updatedUser = userProvider.get(id);
@@ -119,7 +120,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void editUser_updateUserByExample_saveAndFindInvoked() {
+    void editUser_updateUserByExample_saveAndFindInvoked() throws NoSuchEntityException {
         int id = rnd.nextInt(userProvider.getUsersSize());
         int existingId = rnd.nextInt(userProvider.getUsersSize());
         User updatedUser = userProvider.get(id);
@@ -137,7 +138,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void editUser_updateNonExistentUser_exceptionThrown() {
+    void editUser_updateNonExistentUser_exceptionThrown() throws NoSuchEntityException {
         int id = rnd.nextInt(userProvider.getUsersSize());
         int existingId = rnd.nextInt(userProvider.getUsersSize());
         User updatedUser = userProvider.get(id);
@@ -153,7 +154,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void deleteUser_deleteUserById_deleteInvoked() {
+    void deleteUser_deleteUserById_deleteInvoked() throws NoSuchEntityException {
         int id = rnd.nextInt(userProvider.getUsersSize());
         User user = userProvider.get(id);
 
@@ -168,7 +169,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void deleteUser_deleteUserByExample_deleteInvoked() {
+    void deleteUser_deleteUserByExample_deleteInvoked() throws NoSuchEntityException {
         int id = rnd.nextInt(userProvider.getUsersSize());
         User user = userProvider.get(id);
 

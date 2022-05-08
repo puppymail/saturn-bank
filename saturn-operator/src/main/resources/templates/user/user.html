@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <head>
         <meta charset="UTF-8">
         <title>User</title>
@@ -44,10 +46,6 @@
                 <tr>
                     <th scope="col" style="text-align:right">Role</th>
                     <td th:text="${bankUser.getRole()}">Role</td>
-                </tr>
-                <tr>
-                    <th scope="col" style="text-align:right">Last Login</th>
-                    <td th:text="${bankUser.getLastLogin()}">Last Login</td>
                 </tr>
                 <tr>
                     <th scope="col" style="text-align:right">Reg. Date</th>

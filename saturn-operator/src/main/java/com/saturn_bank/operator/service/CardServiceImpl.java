@@ -6,6 +6,8 @@ import com.saturn_bank.operator.dao.Account;
 import com.saturn_bank.operator.dao.Card;
 import com.saturn_bank.operator.dao.CardFactory;
 import com.saturn_bank.operator.dao.User;
+import com.saturn_bank.operator.exception.DeletedEntityException;
+import com.saturn_bank.operator.exception.NoSuchEntityException;
 import com.saturn_bank.operator.repository.AccountRepository;
 import com.saturn_bank.operator.repository.CardRepository;
 import com.saturn_bank.operator.repository.UserRepository;
@@ -40,7 +42,7 @@ public class CardServiceImpl implements CardService {
 
     @Transactional
     @Override
-    public Card issueCard(Account account, User user) {
+    public Card issueCard(Account account, User user) throws NoSuchEntityException, DeletedEntityException {
         if (isNull(account)) {
             log.error("!Account provided is null!");
             throw new NullPointerException("Account provided is null");
@@ -51,10 +53,14 @@ public class CardServiceImpl implements CardService {
         }
 
         Optional<Account> accountOpt = accountRepository.findOne(Example.of(account));
-        Account existingAccount = Utils.softDeleteEntityValidityCheck(accountOpt, Account.class);
+        Account existingAccount = null;
+
+        existingAccount = Utils.softDeleteEntityValidityCheck(accountOpt, Account.class);
 
         Optional<User> userOpt = userRepository.findOne(Example.of(user));
-        User existingUser = Utils.softDeleteEntityValidityCheck(userOpt, User.class);
+        User existingUser = null;
+
+        existingUser = Utils.softDeleteEntityValidityCheck(userOpt, User.class);
 
         Card card = CardFactory.createCard(existingAccount, existingUser);
 
@@ -71,7 +77,7 @@ public class CardServiceImpl implements CardService {
         return savedCard;
     }
 
-    public Card issueCard(Account account) {
+    public Card issueCard(Account account) throws NoSuchEntityException, DeletedEntityException {
         return this.issueCard(account, account.getUser());
     }
 
