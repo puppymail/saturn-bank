@@ -21,15 +21,19 @@ import java.util.function.Supplier;
 @PropertySource("classpath:defaultUserData.properties")
 public class DefaultUserSupplier implements Supplier<User> {
 
-    private static final String FIRST_NAME_PROP_NAME = "firstName";
-    private static final String LAST_NAME_PROP_NAME = "lastName";
-    private static final String MIDDLE_NAME_PROP_NAME = "middleName";
-    private static final String PHONE_NUMBER_PROP_NAME = "phoneNumber";
-    private static final String EMAIL_PROP_NAME = "email";
-    private static final String BIRTH_DATE_PROP_NAME = "birthDate";
-    private static final String PASSWORD_PROP_NAME = "password";
-    private static final String TYPE_PROP_NAME = "type";
-    private static final String ROLE_PROP_NAME = "role";
+    private static final String USER_PREFIX = "user.";
+
+    public static final String FIRST_NAME_PROP_NAME = "firstName";
+    public static final String LAST_NAME_PROP_NAME = "lastName";
+    public static final String MIDDLE_NAME_PROP_NAME = "middleName";
+    public static final String PHONE_NUMBER_PROP_NAME = "phoneNumber";
+    public static final String EMAIL_PROP_NAME = "email";
+    public static final String BIRTH_DATE_PROP_NAME = "birthDate";
+    public static final String REG_DATE_PROP_NAME = "registrationDate";
+    public static final String LAST_MOD_PROP_NAME = "registrationDate";
+    public static final String PASSWORD_PROP_NAME = "password";
+    public static final String TYPE_PROP_NAME = "type";
+    public static final String ROLE_PROP_NAME = "role";
 
     @Autowired
     Environment env;
@@ -41,16 +45,16 @@ public class DefaultUserSupplier implements Supplier<User> {
         now = now();
 
         return User.builder()
-                .firstName(env.getProperty(FIRST_NAME_PROP_NAME))
-                .lastName(env.getProperty(LAST_NAME_PROP_NAME))
-                .middleName(env.getProperty(MIDDLE_NAME_PROP_NAME))
-                .phoneNumber(env.getProperty(PHONE_NUMBER_PROP_NAME))
-                .email(env.getProperty(EMAIL_PROP_NAME))
-                .birthDate(parse(requireNonNull(env.getProperty(BIRTH_DATE_PROP_NAME))))
+                .firstName(env.getProperty(USER_PREFIX + FIRST_NAME_PROP_NAME))
+                .lastName(env.getProperty(USER_PREFIX + LAST_NAME_PROP_NAME))
+                .middleName(env.getProperty(USER_PREFIX + MIDDLE_NAME_PROP_NAME))
+                .phoneNumber(env.getProperty(USER_PREFIX + PHONE_NUMBER_PROP_NAME))
+                .email(env.getProperty(USER_PREFIX + EMAIL_PROP_NAME))
+                .birthDate(parse(requireNonNull(env.getProperty(USER_PREFIX + BIRTH_DATE_PROP_NAME))))
                 .registrationDate(now)
                 .lastModified(now)
-                .password(env.getProperty(PASSWORD_PROP_NAME))
-                .role(UserRole.valueOf(env.getProperty(ROLE_PROP_NAME)))
+                .password(env.getProperty(USER_PREFIX + PASSWORD_PROP_NAME))
+                .role(UserRole.valueOf(env.getProperty(USER_PREFIX + ROLE_PROP_NAME)))
                 .build();
     }
 

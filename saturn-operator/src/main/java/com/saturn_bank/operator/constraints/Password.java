@@ -16,7 +16,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 @Documented
-@Constraint(validatedBy = {PhoneNumberValidator.class})
+@Constraint(validatedBy = {PasswordValidator.class})
 @Retention(RUNTIME)
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Repeatable(Password.List.class)

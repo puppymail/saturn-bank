@@ -13,7 +13,6 @@ public interface UserMapper {
     @Mapping(target = "isDeleted", constant = "false")
     User dtoToUser(UserDto userDto);
 
-    @Mapping(target = "type", source = "user.role.type")
     UserDto userToDto(User user);
 
     @Mapping(target = "isDeleted", constant = "false")

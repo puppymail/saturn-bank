@@ -18,6 +18,8 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+  web:
+    locale: en
 logging:
   level:
     com.saturn_bank.operator: DEBUG
