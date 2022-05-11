@@ -1,38 +1,41 @@
 package com.saturn_bank.operator.constraints;
 
-import static com.saturn_bank.operator.constraints.RegEx.STRICT_PHONE_REGEX;
 import static java.util.Objects.isNull;
+import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
+
+import com.google.common.base.Joiner;
+import org.passay.PasswordData;
+import org.passay.RuleResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+@Component
+@Scope(SCOPE_PROTOTYPE)
 public class PasswordValidator implements ConstraintValidator<Password, String> {
 
-    private static final String PASSWORD_REGEX =
-            "^[_A-Za-z0-9+!?()\\[\\]`;:#$%^&*=@][_A-Za-z0-9\\-+!?()\\[\\]`;:#$%^&*=@.]";
-    private String pattern;
+    @Autowired
+    private org.passay.PasswordValidator validator;
 
     @Override
-    public void initialize(Password constraintAnnotation) {
-        ConstraintValidator.super.initialize(constraintAnnotation);
-        int min = constraintAnnotation.minLength() - 1;
-        if (min < 0) {
-            min = 0;
+    public boolean isValid(String pass, ConstraintValidatorContext context) {
+        if (isNull(pass)) {
+            return false;
         }
-        int max = constraintAnnotation.maxLength() - 1;
-        if (max < 1) {
-            min = 1;
-        }
-        pattern = PASSWORD_REGEX + "{" + min + "," + max + "}$";
-    }
-
-    @Override
-    public boolean isValid(String s, ConstraintValidatorContext context) {
-        if (isNull(s)) {
+        RuleResult result = validator.validate(new PasswordData(pass));
+        if (result.isValid()) {
             return true;
         }
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate(
+                        Joiner.on(",")
+                                .join(validator.getMessages(result)))
+                .addConstraintViolation();
 
-        return s.trim().matches(pattern);
+        return false;
     }
 
 }
