@@ -64,6 +64,7 @@ public class CardServiceImpl implements CardService {
 
         Card card = CardFactory.createCard(existingAccount, existingUser);
 
+        // FIXME: you can get saved card from 'save' method on repo, no need to access database again.
         cardRepository.save(card);
 
         Card savedCard = cardRepository.findById(card.getId()).orElseThrow(() -> new IllegalArgumentException("Saved card not found"));

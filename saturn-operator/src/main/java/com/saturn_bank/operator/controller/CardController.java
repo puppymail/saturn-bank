@@ -3,6 +3,8 @@ package com.saturn_bank.operator.controller;
 import com.saturn_bank.operator.dao.Account;
 import com.saturn_bank.operator.dao.Card;
 import com.saturn_bank.operator.dao.User;
+import com.saturn_bank.operator.exception.DeletedEntityException;
+import com.saturn_bank.operator.exception.NoSuchEntityException;
 import com.saturn_bank.operator.repository.AccountRepository;
 import com.saturn_bank.operator.repository.CardRepository;
 import com.saturn_bank.operator.repository.UserRepository;
@@ -36,9 +38,14 @@ public class CardController {
         this.cardService = cardService;
     }
 
+    // FIXME: If you want to use request parameters (such as '.../page?param1=...&param2=...'), you should use
+    //  @RequestParam annotation, not @PathVariable. PathVariable is specifically for when URI is dependent
+    //  on some variable. While it does work, it's confusing and not correct. Please see UserController's
+    //  showUsers method for an example. This applies to all methods with &'s in this controller.
     @GetMapping("/issue-card-for&account-number={accountNumber}&user-id={userId}")
     @ResponseBody
-    public String issueCard(@PathVariable String accountNumber, @PathVariable long userId) {
+    public String issueCard(@PathVariable String accountNumber, @PathVariable long userId)
+            throws NoSuchEntityException, DeletedEntityException {
         Account account = accountRepository.findByNumber(accountNumber)
                 .orElseThrow(() -> new IllegalArgumentException(NO_ACCOUNT_WITH_THIS_NUMBER));
         User user = userRepository.findById(userId)

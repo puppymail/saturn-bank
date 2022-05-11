@@ -10,6 +10,8 @@ import static org.mockito.ArgumentMatchers.any;
 import com.saturn_bank.operator.dao.Account;
 import com.saturn_bank.operator.dao.Card;
 import com.saturn_bank.operator.dao.User;
+import com.saturn_bank.operator.exception.DeletedEntityException;
+import com.saturn_bank.operator.exception.NoSuchEntityException;
 import com.saturn_bank.operator.repository.AccountRepository;
 import com.saturn_bank.operator.repository.CardRepository;
 import com.saturn_bank.operator.repository.UserRepository;
@@ -47,7 +49,7 @@ class CardServiceTest {
     }
 
     @Test
-    public void issueCard_issueNewCard_saveInvoked() {
+    public void issueCard_issueNewCard_saveInvoked() throws NoSuchEntityException, DeletedEntityException {
         Account account = new Account();
         User user = new User();
         when(accountRepository.findOne(any())).thenReturn(Optional.of(account));

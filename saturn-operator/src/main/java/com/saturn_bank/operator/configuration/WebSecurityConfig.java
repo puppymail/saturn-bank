@@ -1,9 +1,9 @@
 package com.saturn_bank.operator.configuration;
 
-import static com.saturn_bank.operator.controller.Urls.LOGIN_URL;
-import static com.saturn_bank.operator.controller.Urls.Q_MARK;
-import static com.saturn_bank.operator.controller.Urls.REGISTER_URL;
-import static com.saturn_bank.operator.controller.Urls.SLASH;
+import static com.saturn_bank.operator.controller.Uris.LOGIN_URI;
+import static com.saturn_bank.operator.controller.Uris.Q_MARK;
+import static com.saturn_bank.operator.controller.Uris.REGISTER_URI;
+import static com.saturn_bank.operator.controller.Uris.SLASH;
 
 import com.saturn_bank.operator.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers(SLASH, REGISTER_URL, LOGIN_URL)
+                .antMatchers(SLASH, REGISTER_URI, LOGIN_URI)
                 .permitAll()
 //                .antMatchers(LOGIN_URL, REGISTER_URL)
 //                .not().authenticated()
@@ -45,16 +45,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasRole("STAFF")
                 .and()
                 .formLogin()
-                .loginPage(LOGIN_URL)
-                .loginProcessingUrl(LOGIN_URL)
+                .loginPage(LOGIN_URI)
+                .loginProcessingUrl(LOGIN_URI)
                 .defaultSuccessUrl(SLASH, true)
-                .failureUrl(LOGIN_URL + Q_MARK + "error=true")
+                .failureUrl(LOGIN_URI + Q_MARK + "error=true")
                 .usernameParameter("login")
                 .passwordParameter("password")
                 .permitAll()
                 .and()
                 .logout()
-                .logoutSuccessUrl(LOGIN_URL + Q_MARK + "logout=true")
+                .logoutSuccessUrl(LOGIN_URI + Q_MARK + "logout=true")
                 .permitAll();
     }
 

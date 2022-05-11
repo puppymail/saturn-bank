@@ -1,8 +1,8 @@
 package com.saturn_bank.operator.controller.user;
 
-import static com.saturn_bank.operator.controller.Urls.REDIRECT;
-import static com.saturn_bank.operator.controller.Urls.SLASH;
-import static com.saturn_bank.operator.controller.Urls.USERS_URL;
+import static com.saturn_bank.operator.controller.Uris.REDIRECT;
+import static com.saturn_bank.operator.controller.Uris.SLASH;
+import static com.saturn_bank.operator.controller.Uris.USERS_URI;
 import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NO_SUCH_ENTITY_EX_MSG;
 import static java.util.stream.Collectors.toList;
 
@@ -38,14 +38,14 @@ import java.util.function.Supplier;
 // TODO: refactor logging
 @Slf4j
 @Controller
-@RequestMapping(USERS_URL)
+@RequestMapping(USERS_URI)
 public class UserController {
 
-    private static final String DELETE_URL = "/delete";
-    private static final String EDIT_URL = "/edit";
-    private static final String ADD_URL = "/add-user";
-    private static final String ADD_RANDOM_URL = "/add-random";
-    private static final String ID_PATH_VAR_URL = "/{id}";
+    private static final String DELETE_URI = "/delete";
+    private static final String EDIT_URI = "/edit";
+    private static final String ADD_URI = "/add-user";
+    private static final String ADD_RANDOM_URI = "/add-random";
+    private static final String ID_PATH_VAR_URI = "/{id}";
     private static final String ID_PATH_VAR = "id";
 
     private static final String USER_NAMESPACE = "user";
@@ -101,7 +101,7 @@ public class UserController {
         return USERS_PAGE;
     }
 
-    @GetMapping(ID_PATH_VAR_URL)
+    @GetMapping(ID_PATH_VAR_URI)
     public String showUser(@PathVariable(ID_PATH_VAR) long id, Model model) throws NoSuchEntityException {
         Optional<User> userOpt = userService.findById(id);
         if (userOpt.isEmpty()) {
@@ -113,7 +113,7 @@ public class UserController {
     }
 
     // TODO: is this endpoint even used?
-    @GetMapping(ID_PATH_VAR_URL + DELETE_URL)
+    @GetMapping(ID_PATH_VAR_URI + DELETE_URI)
     public String deleteUser(@PathVariable(ID_PATH_VAR) long id, Model model) {
         Optional<User> userOpt = userService.findById(id);
         if (userOpt.isEmpty()) {
@@ -122,10 +122,10 @@ public class UserController {
             model.addAttribute(USER_ATTR_NAME, mapper.userToDto(userOpt.get()));
         }
 
-        return REDIRECT + USERS_URL;
+        return REDIRECT + USERS_URI;
     }
 
-    @GetMapping(ID_PATH_VAR_URL + EDIT_URL)
+    @GetMapping(ID_PATH_VAR_URI + EDIT_URI)
     public String showEditUser(@PathVariable(ID_PATH_VAR) long id, Model model) throws NoSuchEntityException {
         Optional<User> userOpt = userService.findById(id);
         if (userOpt.isEmpty()) {
@@ -143,13 +143,13 @@ public class UserController {
         try {
             userService.createUser(user);
         } catch (EntityAlreadyPresentException eape) {
-            return REDIRECT + USERS_URL;
+            return REDIRECT + USERS_URI;
         }
 
-        return REDIRECT + USERS_URL;
+        return REDIRECT + USERS_URI;
     }
 
-    @GetMapping(ADD_RANDOM_URL)
+    @GetMapping(ADD_RANDOM_URI)
     public String addRandomUser() {
         User user;
         do {
@@ -162,10 +162,10 @@ public class UserController {
             }
         } while(true);
 
-        return REDIRECT + USERS_URL;
+        return REDIRECT + USERS_URI;
     }
 
-    @GetMapping(ADD_URL)
+    @GetMapping(ADD_URI)
     public String showAddUser(Model model) {
         model.addAttribute(USER_ATTR_NAME, new UserDto());
 
@@ -180,10 +180,10 @@ public class UserController {
         }
         userService.createUser(mapper.dtoToUser(userDto));
 
-        return REDIRECT + USERS_URL;
+        return REDIRECT + USERS_URI;
     }
 
-    @PutMapping(ID_PATH_VAR_URL)
+    @PutMapping(ID_PATH_VAR_URI)
     public String editUser(@PathVariable(ID_PATH_VAR) long id,
                            @ModelAttribute(USER_ATTR_NAME) @Valid UserDto userDto,
                            BindingResult br) throws NoSuchEntityException {
@@ -192,14 +192,14 @@ public class UserController {
         }
         userService.editUser(mapper.dtoToUser(userDto), id);
 
-        return REDIRECT + USERS_URL + SLASH + id;
+        return REDIRECT + USERS_URI + SLASH + id;
     }
 
-    @DeleteMapping(ID_PATH_VAR_URL)
+    @DeleteMapping(ID_PATH_VAR_URI)
     public String deleteUser(@PathVariable(ID_PATH_VAR) long id) throws NoSuchEntityException {
         userService.deleteUser(id);
 
-        return REDIRECT + USERS_URL;
+        return REDIRECT + USERS_URI;
     }
 
     // TODO: remove
@@ -223,7 +223,7 @@ public class UserController {
         accountRepo.save(account);
         log.info("Default account inserted in \"account\" table belonging to user id=" + account.getUser().getId());
 
-        return REDIRECT + USERS_URL;
+        return REDIRECT + USERS_URI;
     }
 
     // TODO: remove
@@ -241,7 +241,7 @@ public class UserController {
                 });
         log.info("Cleared all records from \"bank_user\" table.");
 
-        return REDIRECT + USERS_URL;
+        return REDIRECT + USERS_URI;
     }
 
 }
