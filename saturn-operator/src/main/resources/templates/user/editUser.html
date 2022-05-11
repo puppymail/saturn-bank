@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>Edit user</title>
@@ -47,14 +48,6 @@
   <br/>
   <div th:if="${#fields.hasErrors('email')}" th:class="error" th:errors="*{email}">
     Invalid email.
-  </div>
-  <!--            TODO change radio buttons to drop-down lists and pull types/roles from db tables-->
-  <p>Select type:</p>
-  <div>
-    <label for="type_client"><b>CLIENT</b></label>
-    <input type="radio" th:field="*{type}" id="type_client" name="type" value="CLIENT">
-    <label for="type_employee"><b>EMPLOYEE</b></label>
-    <input type="radio" th:field="*{type}" id="type_employee" name="type" value="EMPLOYEE">
   </div>
   <p>Select role:</p>
   <div>

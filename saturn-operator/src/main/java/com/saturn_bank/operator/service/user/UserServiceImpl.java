@@ -7,8 +7,10 @@ import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NO_PASSW
 import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NO_SUCH_ENTITY_EX_MSG;
 import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NULL_PTR_EX_MSG;
 import static java.time.LocalDateTime.now;
+import static java.util.Arrays.stream;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toList;
 
 import com.saturn_bank.operator.dao.User;
 import com.saturn_bank.operator.dao.UserRole;
@@ -250,7 +252,9 @@ public class UserServiceImpl implements UserService {
             return List.of();
         }
 
-        return userRepository.findByType(type);
+        return userRepository.findByRoleIsIn(stream(UserRole.values())
+                .filter(role -> role.getType().equals(type))
+                .collect(toList()));
     }
 
     @Override
@@ -290,7 +294,6 @@ public class UserServiceImpl implements UserService {
         existingUser.setBirthDate(getValue(updatedUser.getBirthDate(), existingUser.getBirthDate()));
         existingUser.setPhoneNumber(getValue(updatedUser.getPhoneNumber(), existingUser.getPhoneNumber()));
         existingUser.setEmail(getValue(updatedUser.getEmail(), existingUser.getEmail()));
-        existingUser.setType(getValue(updatedUser.getType(), existingUser.getType()));
         existingUser.setRole(getValue(updatedUser.getRole(), existingUser.getRole()));
         existingUser.setLastModified(now());
 

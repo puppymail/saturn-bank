@@ -52,9 +52,6 @@ public class EditUserForm {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
 
-    //    @Enum(value = com.saturn_bank.operator.dao.UserType.class, message = INVALID_USER_TYPE_ERROR_MSG)
-    private String type;
-
     //    @Enum(value = com.saturn_bank.operator.dao.UserRole.class, message = INVALID_USER_ROLE_ERROR_MSG)
     private String role;
 

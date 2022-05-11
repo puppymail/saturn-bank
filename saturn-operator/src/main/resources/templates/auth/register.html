@@ -54,14 +54,6 @@
   <div th:if="${#fields.hasErrors('password')}" class="error" style="color:red" th:errors="*{password}">
     Invalid password.
   </div>
-  <!--            TODO change radio buttons to drop-down lists and pull types/roles from db tables-->
-  <p>Select type:</p>
-  <div>
-    <label for="type_client"><b>CLIENT</b></label>
-    <input type="radio" th:field="*{type}" id="type_client" name="type" value="CLIENT">
-    <label for="type_employee"><b>EMPLOYEE</b></label>
-    <input type="radio" th:field="*{type}" id="type_employee" name="type" value="EMPLOYEE">
-  </div>
   <p>Select role:</p>
   <div>
     <label for="role_client"><b>CLIENT</b></label>

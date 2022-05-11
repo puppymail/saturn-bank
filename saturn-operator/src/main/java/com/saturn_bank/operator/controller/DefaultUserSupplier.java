@@ -50,7 +50,6 @@ public class DefaultUserSupplier implements Supplier<User> {
                 .registrationDate(now)
                 .lastModified(now)
                 .password(env.getProperty(PASSWORD_PROP_NAME))
-                .type(UserType.valueOf(env.getProperty(TYPE_PROP_NAME)))
                 .role(UserRole.valueOf(env.getProperty(ROLE_PROP_NAME)))
                 .build();
     }

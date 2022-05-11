@@ -75,10 +75,6 @@ public class User implements SoftDeleteEntity, UserDetails {
     private LocalDateTime lastModified;
 
     @Enumerated
-    @Column(name = "type", nullable = false)
-    private UserType type;
-
-    @Enumerated
     @Column(name = "role", nullable = false)
     private UserRole role;
 

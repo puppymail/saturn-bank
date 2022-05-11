@@ -7,10 +7,10 @@
 </head>
 <body>
 <h4>Login</h4>
-<div th:if="${param.error}" th:class="error">
+<div th:if="${param.error}" style="color:red">
   <p>Invalid credentials provided. Please re-check login and password.</p>
 </div>
-<div th:if="${param.logout}" th:class="">
+<div th:if="${param.logout}">
   <p>You have successfully logged out.</p>
 </div>
 <form method="POST" th:action="@{/login}" id="loginForm" th:object="${loginForm}">

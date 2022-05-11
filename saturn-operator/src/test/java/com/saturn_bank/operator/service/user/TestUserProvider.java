@@ -50,7 +50,6 @@ public class TestUserProvider {
                 .registrationDate(now)
                 .lastModified(now)
                 .password(DEFAULT_PASSWORD)
-                .type(UserType.valueOf(env.getProperty(testUserId + ".type")))
                 .role(UserRole.valueOf(env.getProperty(testUserId + ".role")))
                 .build();
     }

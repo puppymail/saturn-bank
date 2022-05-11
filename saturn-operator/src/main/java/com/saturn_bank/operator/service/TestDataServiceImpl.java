@@ -106,7 +106,6 @@ public class TestDataServiceImpl implements TestDataService{
             user.setPhoneNumber(Objects.requireNonNull(getChildContent((Element) node, "phoneNumber")).getTextContent());
             user.setBirthDate(LocalDate.parse(Objects.requireNonNull(getChildContent((Element) node, "dateOfBirth")).getTextContent()));
             user.setEmail(Objects.requireNonNull(getChildContent((Element) node, "email")).getTextContent());
-            user.setType(UserType.valueOf(Objects.requireNonNull(getChildContent((Element) node, "type")).getTextContent()));
             user.setRole(UserRole.valueOf(Objects.requireNonNull(getChildContent((Element) node, "role")).getTextContent()));
             user.setRegistrationDate(LocalDateTime.now());
             user.setLastModified(user.getRegistrationDate());
