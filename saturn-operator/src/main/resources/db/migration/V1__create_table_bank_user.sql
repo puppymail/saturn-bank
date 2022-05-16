@@ -1,4 +1,3 @@
-
 CREATE TABLE bank_user
 (
     id BIGINT GENERATED ALWAYS AS IDENTITY,
@@ -9,4 +8,4 @@ CREATE TABLE bank_user
     type INT NOT NULL,
     role INT NOT NULL,
     CONSTRAINT pk_user PRIMARY KEY (id)
-)
+);

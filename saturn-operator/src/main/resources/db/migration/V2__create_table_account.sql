@@ -1,4 +1,3 @@
-
 CREATE TABLE account
 (
     id BIGINT GENERATED ALWAYS AS IDENTITY,
@@ -11,6 +10,4 @@ CREATE TABLE account
     account_coin INT NOT NULL,
     CONSTRAINT pk_account PRIMARY KEY (id),
     CONSTRAINT fk_account_user FOREIGN KEY (user_id) REFERENCES bank_user(id)
-)
-
-
+);
