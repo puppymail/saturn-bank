@@ -1,4 +1,3 @@
-
 CREATE TABLE user_type
 (
     id INT GENERATED ALWAYS AS IDENTITY,
@@ -7,5 +6,4 @@ CREATE TABLE user_type
 );
 
 INSERT INTO user_type(type) VALUES ('CLIENT');
-
-INSERT INTO user_type(type) VALUES ('EMPLOYEE')
+INSERT INTO user_type(type) VALUES ('EMPLOYEE');

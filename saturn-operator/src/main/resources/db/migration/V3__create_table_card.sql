@@ -8,6 +8,7 @@ CREATE TABLE card
     type int,
     pincode int,
     cvv2 int,
-    FOREIGN KEY (user_id) REFERENCES bank_user(id),
-    FOREIGN KEY (account_id) REFERENCES account(id)
+    CONSTRAINT pk_card PRIMARY KEY (id),
+    CONSTRAINT fk_card_user FOREIGN KEY (user_id) REFERENCES bank_user(id),
+    CONSTRAINT fk_card_account FOREIGN KEY (account_id) REFERENCES account(id)
 );

@@ -1,4 +1,3 @@
-
 CREATE TABLE user_role
 (
     id INT GENERATED ALWAYS AS IDENTITY,
@@ -7,9 +6,6 @@ CREATE TABLE user_role
 );
 
 INSERT INTO user_role(role) VALUES ('CLIENT');
-
 INSERT INTO user_role(role) VALUES ('OPERATOR');
-
 INSERT INTO user_role(role) VALUES ('ADMIN');
-
-INSERT INTO user_role(role) VALUES ('ATM')
+INSERT INTO user_role(role) VALUES ('ATM');
