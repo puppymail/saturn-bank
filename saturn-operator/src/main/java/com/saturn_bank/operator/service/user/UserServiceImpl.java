@@ -130,6 +130,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         Optional<User> userOpt;
+        if (isNull(login) || login.isBlank()) {
+            throw new UsernameNotFoundException("Empty login provided");
+        }
         if (login.matches(IS_EMAIL_REGEX)) {
             userOpt = userRepository.findByEmail(login);
         }

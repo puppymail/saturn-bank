@@ -112,19 +112,6 @@ public class UserController {
         return USER_PAGE;
     }
 
-    // TODO: is this endpoint even used?
-    @GetMapping(ID_PATH_VAR_URI + DELETE_URI)
-    public String deleteUser(@PathVariable(ID_PATH_VAR) long id, Model model) {
-        Optional<User> userOpt = userService.findById(id);
-        if (userOpt.isEmpty()) {
-            model.addAttribute(USER_ATTR_NAME, new UserDto());
-        } else {
-            model.addAttribute(USER_ATTR_NAME, mapper.userToDto(userOpt.get()));
-        }
-
-        return REDIRECT + USERS_URI;
-    }
-
     @GetMapping(ID_PATH_VAR_URI + EDIT_URI)
     public String showEditUser(@PathVariable(ID_PATH_VAR) long id, Model model) throws NoSuchEntityException {
         Optional<User> userOpt = userService.findById(id);

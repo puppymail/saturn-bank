@@ -1,6 +1,7 @@
 package com.saturn_bank.operator.configuration;
 
 import static com.saturn_bank.operator.controller.Uris.LOGIN_URI;
+import static com.saturn_bank.operator.controller.Uris.LOGOUT_URI;
 import static com.saturn_bank.operator.controller.Uris.Q_MARK;
 import static com.saturn_bank.operator.controller.Uris.REGISTER_URI;
 import static com.saturn_bank.operator.controller.Uris.SLASH;
@@ -37,26 +38,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers(SLASH, REGISTER_URI, LOGIN_URI)
-                .permitAll()
-//                .antMatchers(LOGIN_URL, REGISTER_URL)
-//                .not().authenticated()
-                .anyRequest()
-                .permitAll()
-//                .hasRole("STAFF")
+                    .antMatchers(SLASH)
+                    .permitAll()
+                    .antMatchers(REGISTER_URI, LOGIN_URI)
+                    .not().authenticated()
+                    .antMatchers(LOGOUT_URI)
+                    .authenticated()
+                    .anyRequest()
+                    .hasRole("STAFF")
                 .and()
-                .formLogin()
-                .loginPage(LOGIN_URI)
-                .loginProcessingUrl(LOGIN_URI)
-                .defaultSuccessUrl(SLASH, true)
-                .failureUrl(LOGIN_URI + Q_MARK + "error=true")
-                .usernameParameter("login")
-                .passwordParameter("password")
-                .permitAll()
+                    .formLogin()
+                    .loginPage(LOGIN_URI)
+                    .loginProcessingUrl(LOGIN_URI)
+                    .defaultSuccessUrl(SLASH, true)
+                    .failureUrl(LOGIN_URI + Q_MARK + "error=true")
+                    .usernameParameter("login")
+                    .passwordParameter("password")
                 .and()
-                .logout()
-                .logoutSuccessUrl(LOGIN_URI + Q_MARK + "logout=true")
-                .permitAll();
+                    .logout()
+                    .logoutUrl(LOGOUT_URI)
+                    .logoutSuccessUrl(LOGIN_URI + Q_MARK + "logout=true");
     }
 
 }

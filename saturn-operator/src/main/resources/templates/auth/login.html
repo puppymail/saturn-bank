@@ -13,22 +13,16 @@
 <div th:if="${param.logout}">
   <p>You have successfully logged out.</p>
 </div>
-<form method="POST" th:action="@{/login}" id="loginForm" th:object="${loginForm}">
-  <div th:if="${#fields.hasErrors('login')}">
-    Invalid login.
-  </div>
+<form th:method="POST" th:action="@{/login}" id="loginForm">
   <label for="login">Enter phone number or email:</label>
-  <input type="text" name="login" id="login" th:field="*{login}">
+  <input type="text" name="login" id="login">
   <br/>
-  <div th:if="${#fields.hasErrors('password')}">
-    Invalid password.
-  </div>
   <label for="password">Enter password:</label>
-  <input type="password" name="password" id="password" th:field="*{password}">
+  <input type="password" name="password" id="password">
   <br/>
   <p><input type="submit" value="Login"></p>
 </form>
-<form method="GET" th:action="@{/register}" id="registerRef">
+<form th:method="GET" th:action="@{/register}" id="registerRef">
   <p><input type="submit" value="Register"></p>
 </form>
 </body>

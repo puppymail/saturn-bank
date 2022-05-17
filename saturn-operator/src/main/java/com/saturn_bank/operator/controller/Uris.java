@@ -10,5 +10,6 @@ public class Uris {
     public static final String USERS_URI = "/users";
     public static final String REGISTER_URI = "/register";
     public static final String LOGIN_URI = "/login";
+    public static final String LOGOUT_URI = "/logout";
 
 }

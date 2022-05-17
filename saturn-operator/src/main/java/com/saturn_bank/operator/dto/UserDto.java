@@ -13,14 +13,9 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
-import javax.validation.constraints.PastOrPresent;
-import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
 @Getter
@@ -59,9 +54,14 @@ public class UserDto {
 
     private LocalDateTime lastModified;
 
+    @NotEmpty(message = "{type.notEmpty}")
+    @Enum(value = com.saturn_bank.operator.dao.UserType.class, message = "{type.invalid}")
+    private String type;
+
     @NotEmpty(message = "{role.notEmpty}")
     @Enum(value = com.saturn_bank.operator.dao.UserRole.class, message = "{role.invalid}")
     private String role;
+
 
     @NotEmpty(message = "{password.notEmpty}")
     @Password(message = "{password.invalid}")

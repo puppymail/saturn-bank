@@ -6,7 +6,6 @@ import static com.saturn_bank.operator.controller.Uris.REGISTER_URI;
 
 import com.saturn_bank.operator.dao.User;
 import com.saturn_bank.operator.dto.mapper.UserMapper;
-import com.saturn_bank.operator.dto.web.LoginForm;
 import com.saturn_bank.operator.dto.web.RegistrationForm;
 import com.saturn_bank.operator.exception.EntityAlreadyPresentException;
 import com.saturn_bank.operator.service.user.UserService;
@@ -36,6 +35,7 @@ public class AuthController {
 
     private static final String REG_FORM_ATTR_NAME = "registrationForm";
     private static final String LOGIN_FORM_ATTR_NAME = "loginForm";
+
     private final UserService userService;
     private final UserMapper mapper;
 
@@ -54,25 +54,20 @@ public class AuthController {
     }
 
     @PostMapping(REGISTER_URI)
-    public String processRegistration(@ModelAttribute @Valid RegistrationForm form, BindingResult br) {
+    public String processRegistration(@ModelAttribute @Valid RegistrationForm form, BindingResult br)
+            throws EntityAlreadyPresentException{
         if (br.hasErrors()) {
             log.debug(br.getAllErrors().toString());
             return REGISTER_PAGE;
         }
         User user = mapper.registrationFormToUser(form);
-        try {
-            userService.createUser(user);
-        } catch (EntityAlreadyPresentException e) {
-            throw new RuntimeException(e);
-        }
+        userService.createUser(user);
 
         return REDIRECT + LOGIN_URI;
     }
 
     @GetMapping(LOGIN_URI)
-    public String showLoginPage(Model model) {
-        model.addAttribute(new LoginForm());
-
+    public String showLoginPage() {
         return LOGIN_PAGE;
     }
 
