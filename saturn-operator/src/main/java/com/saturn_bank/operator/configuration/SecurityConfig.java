@@ -22,9 +22,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     UserAuthService userAuthService;
 
     @Autowired
-    LoginSuccessHandler handler;
-
-    @Autowired
     Environment env;
 
     @Autowired
@@ -64,8 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginPage("/login")
                 .usernameParameter("phoneNumber")
-                .passwordParameter("password")
-                .successHandler(handler);
+                .passwordParameter("password");
     }
 
 }

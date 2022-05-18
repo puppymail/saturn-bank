@@ -36,15 +36,15 @@ public class CardFactory {
     @Autowired
     public CardFactory(Environment env) {
         this.env = env;
-    }
-
-    @PostConstruct
-    private void init() {
         DEFAULT_VALIDITY_PERIOD = Integer.parseInt(requireNonNull(
                 env.getProperty(CARD_NAMESPACE + DEFAULT_NAMESPACE + CARD_VALIDITY_PROP)));
         BIN_NUMBER = env.getProperty(CARD_NAMESPACE + DEFAULT_NAMESPACE + CARD_BIN_PROP);
         IDENTITY_DEFAULT_NUMBER = env.getProperty(CARD_NAMESPACE + DEFAULT_NAMESPACE + CARD_IDENTITY_PROP);
     }
+
+//    @PostConstruct
+//    private void init() {
+//    }
 
     public Card createCard(Account account, User user) {
         return createCard(account, user, DEFAULT_VALIDITY_PERIOD);

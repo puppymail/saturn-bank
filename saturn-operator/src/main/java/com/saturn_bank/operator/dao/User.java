@@ -71,9 +71,6 @@ public class User implements SoftDeleteEntity, UserDetails {
     @Column(name = "registration_date", nullable = false)
     private LocalDateTime registrationDate;
 
-    @Column(name = "last_login", nullable = false)
-    private LocalDateTime lastLogin;
-
     @Column(name = "last_modified", nullable = false)
     private LocalDateTime lastModified;
 
