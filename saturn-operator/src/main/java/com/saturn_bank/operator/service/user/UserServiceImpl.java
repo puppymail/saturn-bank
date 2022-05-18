@@ -1,10 +1,10 @@
 package com.saturn_bank.operator.service.user;
 
-import static com.saturn_bank.operator.exception.ErrorMessages.ENTITY_ALREADY_PRESENT_EX;
-import static com.saturn_bank.operator.exception.ErrorMessages.INVALID_ID_PROVIDED_EX;
-import static com.saturn_bank.operator.exception.ErrorMessages.NO_PASSWORD_SET_EX;
-import static com.saturn_bank.operator.exception.ErrorMessages.NO_SUCH_ENTITY_EX;
-import static com.saturn_bank.operator.exception.ErrorMessages.NULL_PTR_EX;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.ENTITY_ALREADY_PRESENT_EX_MSG;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.INVALID_ID_PROVIDED_EX_MSG;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NO_PASSWORD_SET_EX_MSG;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NO_SUCH_ENTITY_EX_MSG;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NULL_PTR_EX_MSG;
 import static java.time.LocalDateTime.now;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.isNull;
@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,35 +32,36 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder encoder) {
         this.userRepository = userRepository;
+        this.encoder = encoder;
     }
 
     @Transactional
     @Override
-    public User createUser(User user) {
+    public User createUser(User user) throws EntityAlreadyPresentException {
         if (nonNull(user.getId()) && userRepository.existsById(user.getId())) {
-            log.error("!User with provided id=" + user.getId() + " already exists!");
-            throw new EntityAlreadyPresentException(ENTITY_ALREADY_PRESENT_EX + user.getId());
+            log.error(ENTITY_ALREADY_PRESENT_EX_MSG);
+            throw new EntityAlreadyPresentException(ENTITY_ALREADY_PRESENT_EX_MSG);
         }
-        if (isNull(user.getPassword()) || user.getPassword().isBlank()) {
-            log.error("!No password set for provided user!");
-            throw new IllegalArgumentException(NO_PASSWORD_SET_EX);
+        String rawPassword = user.getPassword();
+        if (isNull(rawPassword) || rawPassword.isBlank()) {
+            log.error(NO_PASSWORD_SET_EX_MSG);
+            throw new IllegalArgumentException(NO_PASSWORD_SET_EX_MSG);
         }
+        user.setPassword(encoder.encode(rawPassword));
         user.setRegistrationDate(now());
-        log.info("User created at: " + user.getRegistrationDate());
-
-        user.setLastLogin(user.getRegistrationDate());
         user.setLastModified(user.getRegistrationDate());
         user.setDeleted(Boolean.FALSE);
 
         try {
             userRepository.save(user);
         } catch (ConstraintViolationException cve) {
-            log.error("!Constraint " + cve.getConstraintName() + " is violated, unable to save user!");
-            throw new EntityAlreadyPresentException(cve);
+            log.error("Constraint " + cve.getConstraintName() + " is violated, unable to save");
+            throw new EntityAlreadyPresentException(ENTITY_ALREADY_PRESENT_EX_MSG, cve);
         }
 
         return user;
@@ -70,7 +72,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(User user) {
         Optional<User> existingUser;
         if ( ( existingUser = userRepository.findOne(Example.of(user)) ).isEmpty() ) {
-            log.error(NO_SUCH_ENTITY_EX);
+            log.error(NO_SUCH_ENTITY_EX_MSG);
             return;
         }
         user = existingUser.get();
@@ -90,16 +92,16 @@ public class UserServiceImpl implements UserService {
     public void editUser(User updatedUser, User existingUser) {
         if (isNull(updatedUser)) {
             log.error("!newUser provided is null!");
-            throw new NullPointerException(NULL_PTR_EX);
+            throw new NullPointerException(NULL_PTR_EX_MSG);
         }
         if (isNull(existingUser)) {
             log.error("!oldUser provided is null!");
-            throw new NullPointerException(NULL_PTR_EX);
+            throw new NullPointerException(NULL_PTR_EX_MSG);
         }
         Optional<User> existingUserOpt;
         if ( ( existingUserOpt = userRepository.findOne(Example.of(existingUser)) ).isEmpty() ) {
             log.error("!No such user found!");
-            throw new NoSuchEntityException(NO_SUCH_ENTITY_EX);
+            throw new NoSuchEntityException(NO_SUCH_ENTITY_EX_MSG);
         }
         if (existingUserOpt.get().isDeleted()) {
             log.warn("!User being edited is marked as deleted!");
@@ -111,7 +113,7 @@ public class UserServiceImpl implements UserService {
     public void editUser(User updatedUser, Long id) {
         if (isNull(id) || id <= 0) {
             log.error("!Invalid id provided!");
-            throw new IllegalArgumentException(INVALID_ID_PROVIDED_EX);
+            throw new IllegalArgumentException(INVALID_ID_PROVIDED_EX_MSG);
         }
         User existingUser = new User();
         existingUser.setId(id);

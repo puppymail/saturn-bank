@@ -1,11 +1,14 @@
 package com.saturn_bank.operator.service;
 
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NULL_PTR_EX_MSG;
 import static java.util.Objects.isNull;
 
 import com.saturn_bank.operator.dao.Account;
 import com.saturn_bank.operator.dao.Card;
 import com.saturn_bank.operator.dao.CardFactory;
 import com.saturn_bank.operator.dao.User;
+import com.saturn_bank.operator.exception.DeletedEntityException;
+import com.saturn_bank.operator.exception.NoSuchEntityException;
 import com.saturn_bank.operator.repository.AccountRepository;
 import com.saturn_bank.operator.repository.CardRepository;
 import com.saturn_bank.operator.repository.UserRepository;
@@ -28,50 +31,49 @@ public class CardServiceImpl implements CardService {
     private final CardRepository cardRepository;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final CardFactory cardFactory;
 
     @Autowired
-    public CardServiceImpl(CardRepository cardRepository,
-                           AccountRepository accountRepository,
-                           UserRepository userRepository) {
+    public CardServiceImpl(CardRepository cardRepository, AccountRepository accountRepository, UserRepository userRepository, CardFactory cardFactory) {
         this.cardRepository = cardRepository;
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
+        this.cardFactory = cardFactory;
     }
 
     @Transactional
     @Override
-    public Card issueCard(Account account, User user) {
+    public Card issueCard(Account account, User user) throws NoSuchEntityException, DeletedEntityException {
         if (isNull(account)) {
-            log.error("!Account provided is null!");
-            throw new NullPointerException("Account provided is null");
+            log.error("Account provided is null");
+            throw new IllegalArgumentException(NULL_PTR_EX_MSG);
         }
         if (isNull(user)) {
-            log.error("!User provided is null!");
-            throw new NullPointerException("User provided is null");
+            log.error("User provided is null");
+            throw new IllegalArgumentException(NULL_PTR_EX_MSG);
         }
 
         Optional<Account> accountOpt = accountRepository.findOne(Example.of(account));
-        Account existingAccount = Utils.softDeleteEntityValidityCheck(accountOpt, Account.class);
+        Account existingAccount = null;
+
+        existingAccount = Utils.softDeleteEntityValidityCheck(accountOpt, Account.class);
 
         Optional<User> userOpt = userRepository.findOne(Example.of(user));
-        User existingUser = Utils.softDeleteEntityValidityCheck(userOpt, User.class);
+        User existingUser = null;
 
-        Card card = CardFactory.createCard(existingAccount, existingUser);
+        existingUser = Utils.softDeleteEntityValidityCheck(userOpt, User.class);
 
-        cardRepository.save(card);
+        Card card = cardFactory.createCard(existingAccount, existingUser);
 
-        Card savedCard = cardRepository.findById(card.getId()).orElseThrow(() -> new IllegalArgumentException("Saved card not found"));
-        String binNumber = savedCard.getNumber().substring(0, 6);
-        String coinType = savedCard.getNumber().substring(6, 8);
-        String accountType = savedCard.getNumber().substring(8, 11);
-        String identityNumber = String.format("%05d", savedCard.getId());
+        card = cardRepository.save(card);
+        String identityNumber = String.format("%05d", card.getId());
 
-        savedCard.setNumber(binNumber + coinType + accountType + identityNumber);
+        card.setNumber(card.getNumber() + identityNumber);
 
-        return savedCard;
+        return cardRepository.save(card);
     }
 
-    public Card issueCard(Account account) {
+    public Card issueCard(Account account) throws NoSuchEntityException, DeletedEntityException {
         return this.issueCard(account, account.getUser());
     }
 

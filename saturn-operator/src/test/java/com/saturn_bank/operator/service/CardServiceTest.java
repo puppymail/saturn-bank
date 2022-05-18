@@ -8,8 +8,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.ArgumentMatchers.any;
 
 import com.saturn_bank.operator.dao.Account;
+import com.saturn_bank.operator.dao.AccountCoin;
+import com.saturn_bank.operator.dao.AccountType;
 import com.saturn_bank.operator.dao.Card;
+import com.saturn_bank.operator.dao.CardFactory;
 import com.saturn_bank.operator.dao.User;
+import com.saturn_bank.operator.exception.DeletedEntityException;
+import com.saturn_bank.operator.exception.NoSuchEntityException;
 import com.saturn_bank.operator.repository.AccountRepository;
 import com.saturn_bank.operator.repository.CardRepository;
 import com.saturn_bank.operator.repository.UserRepository;
@@ -19,12 +24,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
 class CardServiceTest {
 
     @Mock
@@ -36,6 +39,9 @@ class CardServiceTest {
     @Mock
     AccountRepository accountRepository;
 
+    @Mock
+    CardFactory cardFactory;
+
     CardService cardService;
 
     @BeforeEach
@@ -43,20 +49,28 @@ class CardServiceTest {
         cardService = new CardServiceImpl(
                 cardRepository,
                 accountRepository,
-                userRepository);
+                userRepository,
+                cardFactory);
     }
 
     @Test
-    public void issueCard_issueNewCard_saveInvoked() {
-        Account account = new Account();
+    public void issueCard_issueNewCard_saveInvoked() throws NoSuchEntityException, DeletedEntityException {
+        Account account = Account.builder()
+                .coin(AccountCoin.RUB)
+                .type(AccountType.REGULAR)
+                .build();
         User user = new User();
+        Card card = new Card();
+        card.setId(1L);
         when(accountRepository.findOne(any())).thenReturn(Optional.of(account));
         when(userRepository.findOne(any())).thenReturn(Optional.of(user));
+        when(cardRepository.save(any())).thenReturn(card);
+        when(cardFactory.createCard(account, user)).thenReturn(card);
         cardService.issueCard(account, user);
 
         verify(accountRepository, times(1)).findOne(any());
         verify(userRepository, times(1)).findOne(any());
-        verify(cardRepository, times(1)).save(any());
+        verify(cardRepository, times(2)).save(any());
 
         verifyNoMoreInteractions(userRepository, accountRepository, cardRepository);
     }

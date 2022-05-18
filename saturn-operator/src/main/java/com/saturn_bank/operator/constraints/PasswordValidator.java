@@ -30,10 +30,10 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
             return true;
         }
         context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate(
-                        Joiner.on(",")
-                                .join(validator.getMessages(result)))
-                .addConstraintViolation();
+        for (String violationMessage : validator.getMessages(result)) {
+            context.buildConstraintViolationWithTemplate(violationMessage)
+                    .addConstraintViolation();
+        }
 
         return false;
     }

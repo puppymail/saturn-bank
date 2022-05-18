@@ -1,8 +1,12 @@
 package com.saturn_bank.operator.service.user;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -19,19 +23,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Example;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
 public class UserServiceTest {
 
     @Mock
@@ -42,20 +41,17 @@ public class UserServiceTest {
 
     UserService userService;
 
-    @Autowired
-    TestUserProvider userProvider;
-
-    Random rnd;
-
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userRepository);
-        rnd = new Random();
+        userService = new UserServiceImpl(userRepository, encoder);
     }
 
     @Test
     void findAll_findAllUsers_findAllInvoked() {
-        List<User> expected = List.of(userProvider.get(rnd.nextInt(userProvider.getUsersSize())));
+        List<User> expected = List.of(
+                User.builder().id(1L).build(),
+                User.builder().id(2L).build(),
+                User.builder().id(3L).build());
         when(userRepository.findAll()).thenReturn(expected);
         List<User> actual = userService.findAll();
         assertEquals(expected, actual);
@@ -66,23 +62,30 @@ public class UserServiceTest {
 
     @Test
     void findAll_findAllNotDeletedUsers_findByIsDeletedInvoked() {
-        List<User> expected = List.of(userProvider.get(rnd.nextInt(userProvider.getUsersSize())));
-        when(userRepository.findByIsDeleted(Boolean.FALSE)).thenReturn(expected);
-        List<User> actual = userService.findAll(Boolean.FALSE);
+        List<User> expected = List.of(
+                User.builder().id(1L).build(),
+                User.builder().id(2L).build());
+        when(userRepository.findByIsDeleted(FALSE)).thenReturn(expected);
+        List<User> actual = userService.findAll(FALSE);
         assertEquals(expected, actual);
-        verify(userRepository, times(1)).findByIsDeleted(Boolean.FALSE);
+        verify(userRepository, times(1)).findByIsDeleted(FALSE);
 
         verifyNoMoreInteractions(userRepository);
     }
 
     @Test
-    void createUser_createRandomUser_saveAndExistsInvoked() {
-        int id = rnd.nextInt(userProvider.getUsersSize());
-        User user = userProvider.get(id);
-        userService.createUser(user);
+    void createUser_createNewUser_saveAndExistsInvoked() throws EntityAlreadyPresentException {
+        User user = User.builder().id(1L).password("password").build();
+        User spyUser = spy(user);
 
-        InOrder inOrder = inOrder(userRepository);
+        when(encoder.encode(anyString())).thenReturn("password");
+        userService.createUser(spyUser);
+
+        InOrder inOrder = inOrder(userRepository, encoder, spyUser);
         inOrder.verify(userRepository, times(1)).existsById(anyLong());
+        inOrder.verify(spyUser, times(1)).getPassword();
+        inOrder.verify(encoder, times(1)).encode(anyString());
+        inOrder.verify(spyUser, times(1)).setPassword(anyString());
         inOrder.verify(userRepository, times(1)).save(any());
 
         inOrder.verifyNoMoreInteractions();
@@ -90,9 +93,9 @@ public class UserServiceTest {
 
     @Test
     void createUser_createExistingUser_exceptionThrown() {
-        int id = rnd.nextInt(userProvider.getUsersSize());
-        User user = userProvider.get(id);
-        when(userRepository.existsById(anyLong())).thenReturn(Boolean.TRUE);
+        User user = User.builder().id(1L).password("password").build();
+
+        when(userRepository.existsById(anyLong())).thenReturn(TRUE);
         assertThrows(EntityAlreadyPresentException.class, () -> userService.createUser(user));
 
         verify(userRepository, times(1)).existsById(anyLong());
@@ -101,12 +104,9 @@ public class UserServiceTest {
     }
 
     @Test
-    void editUser_updateUserById_saveAndFindInvoked() {
-        int id = rnd.nextInt(userProvider.getUsersSize());
-        int existingId = rnd.nextInt(userProvider.getUsersSize());
-        User updatedUser = userProvider.get(id);
-        User existingUser = userProvider.get(existingId);
-        existingUser.setId(id + 1L);
+    void editUser_updateUserById_saveAndFindInvoked() throws NoSuchEntityException {
+        User existingUser = User.builder().id(1L).firstName("Name 1").build();
+        User updatedUser = User.builder().id(1L).firstName("Name 2").build();
 
         when(userRepository.findOne(any())).thenReturn(Optional.of(existingUser));
         userService.editUser(updatedUser, existingUser.getId());
@@ -119,12 +119,9 @@ public class UserServiceTest {
     }
 
     @Test
-    void editUser_updateUserByExample_saveAndFindInvoked() {
-        int id = rnd.nextInt(userProvider.getUsersSize());
-        int existingId = rnd.nextInt(userProvider.getUsersSize());
-        User updatedUser = userProvider.get(id);
-        User existingUser = userProvider.get(existingId);
-        existingUser.setId(id + 1L);
+    void editUser_updateUserByExample_saveAndFindInvoked() throws NoSuchEntityException {
+        User existingUser = User.builder().id(1L).firstName("Name 1").build();
+        User updatedUser = User.builder().id(1L).firstName("Name 2").build();
 
         when(userRepository.findOne(Example.of(existingUser))).thenReturn(Optional.of(existingUser));
         userService.editUser(updatedUser, existingUser);
@@ -137,12 +134,9 @@ public class UserServiceTest {
     }
 
     @Test
-    void editUser_updateNonExistentUser_exceptionThrown() {
-        int id = rnd.nextInt(userProvider.getUsersSize());
-        int existingId = rnd.nextInt(userProvider.getUsersSize());
-        User updatedUser = userProvider.get(id);
-        User existingUser = userProvider.get(existingId);
-        existingUser.setId(id + 1L);
+    void editUser_updateNonExistentUser_exceptionThrown() throws NoSuchEntityException {
+        User existingUser = User.builder().id(1L).firstName("Name 1").build();
+        User updatedUser = User.builder().id(1L).firstName("Name 2").build();
 
         when(userRepository.findOne(Example.of(existingUser))).thenReturn(Optional.empty());
         assertThrows(NoSuchEntityException.class, () -> userService.editUser(updatedUser, existingUser));
@@ -153,12 +147,11 @@ public class UserServiceTest {
     }
 
     @Test
-    void deleteUser_deleteUserById_deleteInvoked() {
-        int id = rnd.nextInt(userProvider.getUsersSize());
-        User user = userProvider.get(id);
+    void deleteUser_deleteUserById_deleteInvoked() throws NoSuchEntityException {
+        User user = User.builder().id(1L).build();
 
-        when(userRepository.findOne(Mockito.any())).thenReturn(Optional.of(user));
-        userService.deleteUser(id + 1L);
+        when(userRepository.findOne(any())).thenReturn(Optional.of(user));
+        userService.deleteUser(1L);
 
         InOrder inOrder = inOrder(userRepository);
         inOrder.verify(userRepository, times(1)).findOne(any());
@@ -168,11 +161,10 @@ public class UserServiceTest {
     }
 
     @Test
-    void deleteUser_deleteUserByExample_deleteInvoked() {
-        int id = rnd.nextInt(userProvider.getUsersSize());
-        User user = userProvider.get(id);
+    void deleteUser_deleteUserByExample_deleteInvoked() throws NoSuchEntityException {
+        User user = User.builder().id(1L).build();
 
-        when(userRepository.findOne(Example.of(user))).thenReturn(Optional.of(user));
+        when(userRepository.findOne(any())).thenReturn(Optional.of(user));
         userService.deleteUser(user);
 
         InOrder inOrder = inOrder(userRepository);
