@@ -1,12 +1,22 @@
 package com.saturn_bank.operator.controller;
 
+import static com.saturn_bank.operator.configuration.PropertiesConfig.CLASSPATH;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.DEFAULT_USER_DATA_PROPS_FILE;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_BIRTH_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_EMAIL_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_FIRST_N_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_LAST_N_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_MIDDLE_N_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_PASS_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_PHONE_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_ROLE_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_NAMESPACE;
 import static java.time.LocalDate.parse;
 import static java.time.LocalDateTime.now;
 import static java.util.Objects.requireNonNull;
 
 import com.saturn_bank.operator.dao.User;
 import com.saturn_bank.operator.dao.UserRole;
-import com.saturn_bank.operator.dao.UserType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -18,22 +28,8 @@ import java.util.function.Supplier;
 
 @Slf4j
 @Component
-@PropertySource("classpath:defaultUserData.properties")
+@PropertySource(CLASSPATH + DEFAULT_USER_DATA_PROPS_FILE)
 public class DefaultUserSupplier implements Supplier<User> {
-
-    private static final String USER_PREFIX = "user.";
-
-    public static final String FIRST_NAME_PROP_NAME = "firstName";
-    public static final String LAST_NAME_PROP_NAME = "lastName";
-    public static final String MIDDLE_NAME_PROP_NAME = "middleName";
-    public static final String PHONE_NUMBER_PROP_NAME = "phoneNumber";
-    public static final String EMAIL_PROP_NAME = "email";
-    public static final String BIRTH_DATE_PROP_NAME = "birthDate";
-    public static final String REG_DATE_PROP_NAME = "registrationDate";
-    public static final String LAST_MOD_PROP_NAME = "registrationDate";
-    public static final String PASSWORD_PROP_NAME = "password";
-    public static final String TYPE_PROP_NAME = "type";
-    public static final String ROLE_PROP_NAME = "role";
 
     @Autowired
     Environment env;
@@ -45,16 +41,16 @@ public class DefaultUserSupplier implements Supplier<User> {
         now = now();
 
         return User.builder()
-                .firstName(env.getProperty(USER_PREFIX + FIRST_NAME_PROP_NAME))
-                .lastName(env.getProperty(USER_PREFIX + LAST_NAME_PROP_NAME))
-                .middleName(env.getProperty(USER_PREFIX + MIDDLE_NAME_PROP_NAME))
-                .phoneNumber(env.getProperty(USER_PREFIX + PHONE_NUMBER_PROP_NAME))
-                .email(env.getProperty(USER_PREFIX + EMAIL_PROP_NAME))
-                .birthDate(parse(requireNonNull(env.getProperty(USER_PREFIX + BIRTH_DATE_PROP_NAME))))
+                .firstName(env.getProperty(USER_NAMESPACE + USER_FIRST_N_PROP))
+                .lastName(env.getProperty(USER_NAMESPACE + USER_LAST_N_PROP))
+                .middleName(env.getProperty(USER_NAMESPACE + USER_MIDDLE_N_PROP))
+                .phoneNumber(env.getProperty(USER_NAMESPACE + USER_PHONE_PROP))
+                .email(env.getProperty(USER_NAMESPACE + USER_EMAIL_PROP))
+                .birthDate(parse(requireNonNull(env.getProperty(USER_NAMESPACE + USER_BIRTH_PROP))))
                 .registrationDate(now)
                 .lastModified(now)
-                .password(env.getProperty(USER_PREFIX + PASSWORD_PROP_NAME))
-                .role(UserRole.valueOf(env.getProperty(USER_PREFIX + ROLE_PROP_NAME)))
+                .password(env.getProperty(USER_NAMESPACE + USER_PASS_PROP))
+                .role(UserRole.valueOf(env.getProperty(USER_NAMESPACE + USER_ROLE_PROP)))
                 .build();
     }
 

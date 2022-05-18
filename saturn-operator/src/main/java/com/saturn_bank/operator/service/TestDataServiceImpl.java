@@ -39,13 +39,15 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@Profile("test")
+@Profile("testdb")
 public class TestDataServiceImpl implements TestDataService{
 
-    static final String TEST_USERS_FILE = "saturn-operator/src/main/resources/testUserData.xml";
-    static final String TEST_ACCOUNTS_FILE = "saturn-operator/src/main/resources/testAccountData.xml";
-    static final String TEST_CARDS_FILE = "saturn-operator/src/main/resources/testCardData.xml";
-    static final String TEST_TRANSACTIONS_FILE = "saturn-operator/src/main/resources/testTransactionData.xml";
+    static final String TEST_USERS_FILE = "src/main/resources/testUserData.xml";
+    static final String TEST_ACCOUNTS_FILE = "src/main/resources/testAccountData.xml";
+    static final String TEST_CARDS_FILE = "src/main/resources/testCardData.xml";
+    static final String TEST_TRANSACTIONS_FILE = "src/main/resources/testTransactionData.xml";
+
+    static final String DEFAULT_PASSWORD = "password";
 
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
@@ -109,6 +111,7 @@ public class TestDataServiceImpl implements TestDataService{
             user.setRole(UserRole.valueOf(Objects.requireNonNull(getChildContent((Element) node, "role")).getTextContent()));
             user.setRegistrationDate(LocalDateTime.now());
             user.setLastModified(user.getRegistrationDate());
+            user.setPassword(DEFAULT_PASSWORD);
             users.add(user);
         }
         return users;

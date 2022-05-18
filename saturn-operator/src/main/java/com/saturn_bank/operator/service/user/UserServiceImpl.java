@@ -5,6 +5,8 @@ import static com.saturn_bank.operator.exception.ExceptionErrorMessages.ENTITY_A
 import static com.saturn_bank.operator.exception.ExceptionErrorMessages.INVALID_ID_PROVIDED_EX_MSG;
 import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NO_PASSWORD_SET_EX_MSG;
 import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NO_SUCH_ENTITY_EX_MSG;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NULL_OR_EMPTY_LOGIN_EX_MSG;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NULL_OR_EMPTY_PASSWORD_PROVIDED_EX_MSG;
 import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NULL_PTR_EX_MSG;
 import static java.time.LocalDateTime.now;
 import static java.util.Arrays.stream;
@@ -50,12 +52,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(User user) throws EntityAlreadyPresentException {
         if (nonNull(user.getId()) && userRepository.existsById(user.getId())) {
-            log.error("!User with provided id=" + user.getId() + " already exists!");
-            throw new EntityAlreadyPresentException(ENTITY_ALREADY_PRESENT_EX_MSG + user.getId());
+            log.error(ENTITY_ALREADY_PRESENT_EX_MSG);
+            throw new EntityAlreadyPresentException(ENTITY_ALREADY_PRESENT_EX_MSG, User.class, user.getId());
         }
         String rawPassword = user.getPassword();
         if (isNull(rawPassword) || rawPassword.isBlank()) {
-            log.error("!No password set for provided user!");
+            log.error(NO_PASSWORD_SET_EX_MSG);
             throw new IllegalArgumentException(NO_PASSWORD_SET_EX_MSG);
         }
         user.setPassword(encoder.encode(rawPassword));
@@ -66,8 +68,8 @@ public class UserServiceImpl implements UserService {
         try {
             userRepository.save(user);
         } catch (ConstraintViolationException cve) {
-            log.error("!Constraint " + cve.getConstraintName() + " is violated, unable to save user!");
-            throw new EntityAlreadyPresentException(cve);
+            log.error("Constraint " + cve.getConstraintName() + " is violated, unable to save");
+            throw new EntityAlreadyPresentException(ENTITY_ALREADY_PRESENT_EX_MSG, User.class, cve);
         }
 
         return user;
@@ -75,11 +77,11 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void deleteUser(User user) {
+    public void deleteUser(User user) throws NoSuchEntityException {
         Optional<User> existingUser;
         if ( ( existingUser = userRepository.findOne(Example.of(user)) ).isEmpty() ) {
             log.error(NO_SUCH_ENTITY_EX_MSG);
-            return;
+            throw new NoSuchEntityException(NO_SUCH_ENTITY_EX_MSG, User.class);
         }
         user = existingUser.get();
         userRepository.delete(user);
@@ -87,7 +89,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUser(Long id) throws NoSuchEntityException {
         User user = new User();
         user.setId(id);
         deleteUser(user);
@@ -97,20 +99,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public void editUser(User updatedUser, User existingUser) throws NoSuchEntityException {
         if (isNull(updatedUser)) {
-            log.error("!newUser provided is null!");
-            throw new NullPointerException(NULL_PTR_EX_MSG);
+            log.error("Updated user provided is null");
+            throw new IllegalArgumentException(NULL_PTR_EX_MSG);
         }
         if (isNull(existingUser)) {
-            log.error("!oldUser provided is null!");
-            throw new NullPointerException(NULL_PTR_EX_MSG);
+            log.error("Existing user provided is null");
+            throw new IllegalArgumentException(NULL_PTR_EX_MSG);
         }
         Optional<User> existingUserOpt;
         if ( ( existingUserOpt = userRepository.findOne(Example.of(existingUser)) ).isEmpty() ) {
-            log.error("!No such user found!");
-            throw new NoSuchEntityException(NO_SUCH_ENTITY_EX_MSG);
+            log.error(NO_SUCH_ENTITY_EX_MSG);
+            throw new NoSuchEntityException(NO_SUCH_ENTITY_EX_MSG, User.class);
         }
         if (existingUserOpt.get().isDeleted()) {
-            log.warn("!User being edited is marked as deleted!");
+            log.warn("User being edited is marked as deleted!");
         }
         updateUser(updatedUser, existingUserOpt.get());
     }
@@ -118,7 +120,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void editUser(User updatedUser, Long id) throws NoSuchEntityException {
         if (isNull(id) || id <= 0) {
-            log.error("!Invalid id provided!");
+            log.error("Invalid id provided!");
             throw new IllegalArgumentException(INVALID_ID_PROVIDED_EX_MSG);
         }
         User existingUser = new User();
@@ -131,7 +133,7 @@ public class UserServiceImpl implements UserService {
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         Optional<User> userOpt;
         if (isNull(login) || login.isBlank()) {
-            throw new UsernameNotFoundException("Empty login provided");
+            throw new IllegalArgumentException(NULL_OR_EMPTY_LOGIN_EX_MSG);
         }
         if (login.matches(IS_EMAIL_REGEX)) {
             userOpt = userRepository.findByEmail(login);
@@ -140,7 +142,7 @@ public class UserServiceImpl implements UserService {
             userOpt = userRepository.findByPhoneNumber(login);
         }
         if (userOpt.isEmpty()) {
-            throw new UsernameNotFoundException("No user found with login: " + login);
+            throw new UsernameNotFoundException(NO_SUCH_ENTITY_EX_MSG + " with username = " + login);
         }
 
         return userOpt.get();
@@ -148,11 +150,14 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void changePassword(User user, String rawPassword) {
+    public void changePassword(User user, String rawPassword) throws NoSuchEntityException {
         Optional<User> userOpt;
+        if (isNull(rawPassword) || rawPassword.isBlank()) {
+            throw new IllegalArgumentException(NULL_OR_EMPTY_PASSWORD_PROVIDED_EX_MSG);
+        }
         if ( ( userOpt = userRepository.findOne(Example.of(user)) ).isEmpty() ) {
             log.error("!No such user found!");
-            return;
+            throw new NoSuchEntityException(NO_SUCH_ENTITY_EX_MSG, User.class);
         }
         User existingUser = userOpt.get();
         existingUser.setPassword(encoder.encode(rawPassword));
@@ -161,7 +166,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePassword(Long id, String rawPassword) {
+    public void changePassword(Long id, String rawPassword) throws NoSuchEntityException {
         changePassword(User.builder()
                 .id(id)
                 .build(), rawPassword);

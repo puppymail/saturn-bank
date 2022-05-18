@@ -13,12 +13,16 @@ public class NoSuchEntityException extends Exception {
         super(message);
     }
 
+    public NoSuchEntityException(String message, Class<?> entityClass) {
+        super(message + " - " + entityClass.getSimpleName());
+    }
+
     public NoSuchEntityException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public NoSuchEntityException(Throwable cause) {
-        super(cause);
+    public NoSuchEntityException(String message, Class<?> entityClass, Throwable cause) {
+        super(message + " - " + entityClass.getSimpleName(), cause);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.saturn_bank.operator.service;
 
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NULL_PTR_EX_MSG;
 import static java.util.Objects.isNull;
 
 import com.saturn_bank.operator.dao.Account;
@@ -30,26 +31,26 @@ public class CardServiceImpl implements CardService {
     private final CardRepository cardRepository;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final CardFactory cardFactory;
 
     @Autowired
-    public CardServiceImpl(CardRepository cardRepository,
-                           AccountRepository accountRepository,
-                           UserRepository userRepository) {
+    public CardServiceImpl(CardRepository cardRepository, AccountRepository accountRepository, UserRepository userRepository, CardFactory cardFactory) {
         this.cardRepository = cardRepository;
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
+        this.cardFactory = cardFactory;
     }
 
     @Transactional
     @Override
     public Card issueCard(Account account, User user) throws NoSuchEntityException, DeletedEntityException {
         if (isNull(account)) {
-            log.error("!Account provided is null!");
-            throw new NullPointerException("Account provided is null");
+            log.error("Account provided is null");
+            throw new IllegalArgumentException(NULL_PTR_EX_MSG);
         }
         if (isNull(user)) {
-            log.error("!User provided is null!");
-            throw new NullPointerException("User provided is null");
+            log.error("User provided is null");
+            throw new IllegalArgumentException(NULL_PTR_EX_MSG);
         }
 
         Optional<Account> accountOpt = accountRepository.findOne(Example.of(account));
@@ -62,20 +63,14 @@ public class CardServiceImpl implements CardService {
 
         existingUser = Utils.softDeleteEntityValidityCheck(userOpt, User.class);
 
-        Card card = CardFactory.createCard(existingAccount, existingUser);
+        Card card = cardFactory.createCard(existingAccount, existingUser);
 
-        // FIXME: you can get saved card from 'save' method on repo, no need to access database again.
-        cardRepository.save(card);
+        card = cardRepository.save(card);
+        String identityNumber = String.format("%05d", card.getId());
 
-        Card savedCard = cardRepository.findById(card.getId()).orElseThrow(() -> new IllegalArgumentException("Saved card not found"));
-        String binNumber = savedCard.getNumber().substring(0, 6);
-        String coinType = savedCard.getNumber().substring(6, 8);
-        String accountType = savedCard.getNumber().substring(8, 11);
-        String identityNumber = String.format("%05d", savedCard.getId());
+        card.setNumber(card.getNumber() + identityNumber);
 
-        savedCard.setNumber(binNumber + coinType + accountType + identityNumber);
-
-        return savedCard;
+        return cardRepository.save(card);
     }
 
     public Card issueCard(Account account) throws NoSuchEntityException, DeletedEntityException {

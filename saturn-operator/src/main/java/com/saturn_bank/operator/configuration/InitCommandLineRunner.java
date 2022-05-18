@@ -1,14 +1,16 @@
 package com.saturn_bank.operator.configuration;
 
-import static com.saturn_bank.operator.controller.DefaultUserSupplier.BIRTH_DATE_PROP_NAME;
-import static com.saturn_bank.operator.controller.DefaultUserSupplier.EMAIL_PROP_NAME;
-import static com.saturn_bank.operator.controller.DefaultUserSupplier.FIRST_NAME_PROP_NAME;
-import static com.saturn_bank.operator.controller.DefaultUserSupplier.LAST_NAME_PROP_NAME;
-import static com.saturn_bank.operator.controller.DefaultUserSupplier.MIDDLE_NAME_PROP_NAME;
-import static com.saturn_bank.operator.controller.DefaultUserSupplier.PASSWORD_PROP_NAME;
-import static com.saturn_bank.operator.controller.DefaultUserSupplier.PHONE_NUMBER_PROP_NAME;
-import static com.saturn_bank.operator.controller.DefaultUserSupplier.REG_DATE_PROP_NAME;
-import static com.saturn_bank.operator.controller.DefaultUserSupplier.ROLE_PROP_NAME;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.ADMIN_DATA_PROPS_FILE;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.ADMIN_NAMESPACE;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.CLASSPATH;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_BIRTH_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_EMAIL_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_FIRST_N_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_LAST_N_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_MIDDLE_N_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_PASS_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_PHONE_PROP;
+import static com.saturn_bank.operator.configuration.PropertiesConfig.USER_ROLE_PROP;
 import static java.time.LocalDate.parse;
 import static java.time.LocalDateTime.now;
 import static java.util.Objects.requireNonNull;
@@ -19,6 +21,7 @@ import com.saturn_bank.operator.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,10 +30,9 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Component
-@PropertySource("classpath:adminData.properties")
+@Profile("!test")
+@PropertySource(CLASSPATH + ADMIN_DATA_PROPS_FILE)
 public class InitCommandLineRunner implements CommandLineRunner {
-
-    private static final String ADMIN_PREFIX = "admin.";
 
     UserRepository userRepo;
     Environment env;
@@ -45,24 +47,24 @@ public class InitCommandLineRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (userRepo.findByPhoneNumber(requireNonNull(env.getProperty(ADMIN_PREFIX + PHONE_NUMBER_PROP_NAME))).isEmpty()) {
+        if (userRepo.findByPhoneNumber(requireNonNull(env.getProperty(ADMIN_NAMESPACE + USER_PHONE_PROP))).isEmpty()) {
             LocalDateTime now = now();
             User user = User.builder()
-                    .firstName(requireNonNull(env.getProperty(ADMIN_PREFIX + FIRST_NAME_PROP_NAME)))
-                    .lastName(requireNonNull(env.getProperty(ADMIN_PREFIX + LAST_NAME_PROP_NAME)))
-                    .middleName(env.getProperty(ADMIN_PREFIX + MIDDLE_NAME_PROP_NAME))
-                    .phoneNumber(requireNonNull(env.getProperty(ADMIN_PREFIX + PHONE_NUMBER_PROP_NAME)))
-                    .email(requireNonNull(env.getProperty(ADMIN_PREFIX + EMAIL_PROP_NAME)))
-                    .birthDate(parse(requireNonNull(env.getProperty(ADMIN_PREFIX + BIRTH_DATE_PROP_NAME))))
+                    .firstName(requireNonNull(env.getProperty(ADMIN_NAMESPACE + USER_FIRST_N_PROP)))
+                    .lastName(requireNonNull(env.getProperty(ADMIN_NAMESPACE + USER_LAST_N_PROP)))
+                    .middleName(env.getProperty(ADMIN_NAMESPACE + USER_MIDDLE_N_PROP))
+                    .phoneNumber(requireNonNull(env.getProperty(ADMIN_NAMESPACE + USER_PHONE_PROP)))
+                    .email(requireNonNull(env.getProperty(ADMIN_NAMESPACE + USER_EMAIL_PROP)))
+                    .birthDate(parse(requireNonNull(env.getProperty(ADMIN_NAMESPACE + USER_BIRTH_PROP))))
                     .registrationDate(now)
                     .lastModified(now)
-                    .password(encoder.encode(requireNonNull(env.getProperty(ADMIN_PREFIX + PASSWORD_PROP_NAME))))
-                    .role(UserRole.valueOf(requireNonNull(env.getProperty(ADMIN_PREFIX + ROLE_PROP_NAME))))
+                    .password(encoder.encode(requireNonNull(env.getProperty(ADMIN_NAMESPACE + USER_PASS_PROP))))
+                    .role(UserRole.valueOf(requireNonNull(env.getProperty(ADMIN_NAMESPACE + USER_ROLE_PROP))))
                     .build();
             long id = userRepo.save(user).getId();
             log.debug("Admin user with id=" + id + " saved.");
-            log.debug("Login=" + env.getProperty(ADMIN_PREFIX + PHONE_NUMBER_PROP_NAME));
-            log.debug("Pass=" + env.getProperty(ADMIN_PREFIX + PASSWORD_PROP_NAME));
+            log.debug("Login=" + env.getProperty(ADMIN_NAMESPACE + USER_PHONE_PROP));
+            log.debug("Pass=" + env.getProperty(ADMIN_NAMESPACE + USER_PASS_PROP));
         }
     }
 
