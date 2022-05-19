@@ -49,7 +49,6 @@ public class TestUserProvider {
                 .birthDate(parse(requireNonNull(env.getProperty(testUserId + ".dateOfBirth"))))
                 .registrationDate(now)
                 .lastModified(now)
-                .lastLogin(now)
                 .password(DEFAULT_PASSWORD)
                 .type(UserType.valueOf(env.getProperty(testUserId + ".type")))
                 .role(UserRole.valueOf(env.getProperty(testUserId + ".role")))

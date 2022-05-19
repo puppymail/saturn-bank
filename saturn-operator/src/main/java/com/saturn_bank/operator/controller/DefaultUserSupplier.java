@@ -49,7 +49,6 @@ public class DefaultUserSupplier implements Supplier<User> {
                 .birthDate(parse(requireNonNull(env.getProperty(BIRTH_DATE_PROP_NAME))))
                 .registrationDate(now)
                 .lastModified(now)
-                .lastLogin(now)
                 .password(env.getProperty(PASSWORD_PROP_NAME))
                 .type(UserType.valueOf(env.getProperty(TYPE_PROP_NAME)))
                 .role(UserRole.valueOf(env.getProperty(ROLE_PROP_NAME)))
