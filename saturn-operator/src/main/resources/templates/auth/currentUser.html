@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>Current User</title>
+  <link rel="stylesheet" th:href="@{/styles.css}"/>
+</head>
+<body>
+<div>
+  <table>
+    <tr>
+      <th scope="col" style="text-align:right">ID</th>
+      <td sec:authentication="principal.id">ID</td>
+    </tr>
+    <tr>
+      <th scope="col" style="text-align:right">First name</th>
+      <td sec:authentication="principal.firstName">First name</td>
+    </tr>
+    <tr>
+      <th scope="col" style="text-align:right">Middle name</th>
+      <td sec:authentication="principal.middleName">Middle name</td>
+    </tr>
+    <tr>
+      <th scope="col" style="text-align:right">Last name</th>
+      <td sec:authentication="principal.lastName">Last name</td>
+    </tr>
+    <tr>
+      <th scope="col" style="text-align:right">Birth date</th>
+      <td sec:authentication="principal.birthDate">Birth date</td>
+    </tr>
+    <tr>
+      <th scope="col" style="text-align:right">Phone number</th>
+      <td sec:authentication="principal.phoneNumber">Phone number</td>
+    </tr>
+    <tr>
+      <th scope="col" style="text-align:right">EMail</th>
+      <td sec:authentication="principal.email">Email</td>
+    </tr>
+    <tr>
+      <th scope="col" style="text-align:right">Type</th>
+      <td sec:authentication="principal.role.type">Type</td>
+    </tr>
+    <tr>
+      <th scope="col" style="text-align:right">Role</th>
+      <td sec:authentication="principal.role">Role</td>
+    </tr>
+    <tr>
+      <th scope="col" style="text-align:right">Reg. Date</th>
+      <td sec:authentication="principal.registrationDate">Reg. Date</td>
+    </tr>
+    <tr>
+      <th scope="col" style="text-align:right">Last Mod.</th>
+      <td sec:authentication="principal.lastModified">Last Mod.</td>
+    </tr>
+    <tr>
+      <th scope="col" style="text-align:right">Is Deleted</th>
+      <td sec:authentication="principal.deleted">Is Deleted</td>
+    </tr>
+    <tr>
+      <td scope="col" style="text-align:center">
+        <form th:method="GET" th:action="@{/users/{id}/edit(id=${#authentication.principal.id})}">
+          <input type="submit" value="EDIT">
+        </form>
+      </td>
+    </tr>
+    <tr>
+      <td scope="col" style="text-align:center">
+        <form th:method="GET" th:action="@{/}">
+          <input type="submit" value="HOME PAGE">
+        </form>
+      </td>
+    </tr>
+  </table>
+</div>
+<br/>
+<div>
+  <form method="POST" th:action="@{/logout}">
+    <p><input type="submit" value="Logout"></p>
+  </form>
+</div>
+</body>
+</html>

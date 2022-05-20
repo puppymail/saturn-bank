@@ -14,27 +14,17 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
 import java.util.List;
-import java.util.Locale;
 
 @Configuration
 public class BeanConfiguration {
 
-    private static final int NUM_OF_CHARACTERISTICS = 3;
-    private static final int SEQUENCE_LENGTH = 5;
-    private static final int MIN_PASS_LEN = 8;
-    private static final int MAX_PASS_LEN = 16;
-
-    @Bean
-    public PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
-    }
+    public static final int NUM_OF_CHARACTERISTICS = 3;
+    public static final int SEQUENCE_LENGTH = 5;
+    public static final int MIN_PASS_LEN = 8;
+    public static final int MAX_PASS_LEN = 16;
 
     @Bean
     public PasswordValidator passayPasswordValidator() {
@@ -63,14 +53,6 @@ public class BeanConfiguration {
         res.setBasename("classpath:messages");
 
         return res;
-    }
-
-    @Bean
-    public LocaleResolver localeResolver(){
-        CookieLocaleResolver resolver = new CookieLocaleResolver();
-        resolver.setDefaultLocale(new Locale("en"));
-
-        return resolver;
     }
 
     @Bean

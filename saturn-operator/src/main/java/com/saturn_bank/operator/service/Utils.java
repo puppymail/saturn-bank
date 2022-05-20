@@ -17,7 +17,9 @@ import java.util.Optional;
 @Slf4j
 public class Utils {
 
-    public static <E extends SoftDeleteEntity> E softDeleteEntityValidityCheck(Optional<E> entityOpt, Class<E> entityClass) {
+    public static <E extends SoftDeleteEntity> E softDeleteEntityValidityCheck(
+            Optional<E> entityOpt,
+            Class<E> entityClass) throws NoSuchEntityException, DeletedEntityException {
         if (entityOpt.isEmpty()) {
             log.error("!No matching " + entityClass.getSimpleName() + " entity found!");
             throw new NoSuchEntityException("No matching " + entityClass.getSimpleName() + " entity found");

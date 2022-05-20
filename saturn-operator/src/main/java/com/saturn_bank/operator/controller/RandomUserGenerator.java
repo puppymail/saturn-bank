@@ -26,7 +26,6 @@ public class RandomUserGenerator implements Supplier<User> {
         user.setEmail(rd.getRandomEmail());
         user.setBirthDate(rd.getRandomDate());
         user.setRegistrationDate(rd.getRandomDateTime());
-        user.setType(UserType.values()[random.nextInt(UserType.values().length)]);
         user.setRole(UserRole.values()[random.nextInt(UserRole.values().length)]);
 
         return user;

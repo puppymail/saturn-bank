@@ -147,6 +147,75 @@ public class UserServiceTest {
     }
 
     @Test
+    void changePassword_updateUserById_saveAndFindInvoked() throws NoSuchEntityException {
+        User user = User.builder().id(1L).password("old password").build();
+        User spyUser = spy(user);
+
+        when(encoder.encode(anyString())).thenReturn("new password");
+        when(userRepository.findOne(any())).thenReturn(Optional.of(spyUser));
+
+        assertEquals("old password", spyUser.getPassword());
+        userService.changePassword(1L, "new password");
+        assertEquals("new password", spyUser.getPassword());
+
+        InOrder inOrder = inOrder(userRepository, encoder, spyUser);
+        inOrder.verify(spyUser, times(1)).getPassword();
+        inOrder.verify(userRepository, times(1)).findOne(any());
+        inOrder.verify(encoder, times(1)).encode(anyString());
+        inOrder.verify(spyUser, times(1)).setPassword(anyString());
+        inOrder.verify(userRepository, times(1)).save(any());
+        inOrder.verify(spyUser, times(1)).getPassword();
+
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    void changePassword_updateUserByExample_saveAndFindInvoked() throws NoSuchEntityException {
+        User user = User.builder().id(1L).password("old password").build();
+        User spyUser = spy(user);
+
+        when(encoder.encode(anyString())).thenReturn("new password");
+        when(userRepository.findOne(any())).thenReturn(Optional.of(spyUser));
+
+        assertEquals("old password", spyUser.getPassword());
+        userService.changePassword(spyUser, "new password");
+        assertEquals("new password", spyUser.getPassword());
+
+        InOrder inOrder = inOrder(userRepository, encoder, spyUser);
+        inOrder.verify(spyUser, times(1)).getPassword();
+        inOrder.verify(userRepository, times(1)).findOne(any());
+        inOrder.verify(encoder, times(1)).encode(anyString());
+        inOrder.verify(spyUser, times(1)).setPassword(anyString());
+        inOrder.verify(userRepository, times(1)).save(any());
+        inOrder.verify(spyUser, times(1)).getPassword();
+
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    void changePassword_updateNonExistentUser_exceptionThrown() throws NoSuchEntityException {
+        User user = User.builder().id(1L).password("old password").build();
+        User spyUser = spy(user);
+
+        when(encoder.encode(anyString())).thenReturn("new password");
+        when(userRepository.findOne(any())).thenReturn(Optional.of(spyUser));
+
+        assertEquals("old password", spyUser.getPassword());
+        userService.changePassword(spyUser, "new password");
+        assertEquals("new password", spyUser.getPassword());
+
+        InOrder inOrder = inOrder(userRepository, encoder, spyUser);
+        inOrder.verify(spyUser, times(1)).getPassword();
+        inOrder.verify(userRepository, times(1)).findOne(any());
+        inOrder.verify(encoder, times(1)).encode(anyString());
+        inOrder.verify(spyUser, times(1)).setPassword(anyString());
+        inOrder.verify(userRepository, times(1)).save(any());
+        inOrder.verify(spyUser, times(1)).getPassword();
+
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
     void deleteUser_deleteUserById_deleteInvoked() throws NoSuchEntityException {
         User user = User.builder().id(1L).build();
 

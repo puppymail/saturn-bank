@@ -1,6 +1,6 @@
 package com.saturn_bank.operator.exception;
 
-public class DeletedEntityException extends IllegalArgumentException {
+public class DeletedEntityException extends Exception {
 
     public DeletedEntityException() {
         super();

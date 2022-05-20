@@ -1,13 +1,18 @@
 package com.saturn_bank.operator.service.user;
 
+import static com.saturn_bank.operator.constraints.RegEx.IS_EMAIL_REGEX;
 import static com.saturn_bank.operator.exception.ExceptionErrorMessages.ENTITY_ALREADY_PRESENT_EX_MSG;
 import static com.saturn_bank.operator.exception.ExceptionErrorMessages.INVALID_ID_PROVIDED_EX_MSG;
 import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NO_PASSWORD_SET_EX_MSG;
 import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NO_SUCH_ENTITY_EX_MSG;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NULL_OR_EMPTY_LOGIN_EX_MSG;
+import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NULL_OR_EMPTY_PASSWORD_PROVIDED_EX_MSG;
 import static com.saturn_bank.operator.exception.ExceptionErrorMessages.NULL_PTR_EX_MSG;
 import static java.time.LocalDateTime.now;
+import static java.util.Arrays.stream;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toList;
 
 import com.saturn_bank.operator.dao.User;
 import com.saturn_bank.operator.dao.UserRole;
@@ -19,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +39,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
     private final PasswordEncoder encoder;
 
     @Autowired
@@ -45,7 +53,7 @@ public class UserServiceImpl implements UserService {
     public User createUser(User user) throws EntityAlreadyPresentException {
         if (nonNull(user.getId()) && userRepository.existsById(user.getId())) {
             log.error(ENTITY_ALREADY_PRESENT_EX_MSG);
-            throw new EntityAlreadyPresentException(ENTITY_ALREADY_PRESENT_EX_MSG);
+            throw new EntityAlreadyPresentException(ENTITY_ALREADY_PRESENT_EX_MSG, User.class, user.getId());
         }
         String rawPassword = user.getPassword();
         if (isNull(rawPassword) || rawPassword.isBlank()) {
@@ -61,7 +69,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
         } catch (ConstraintViolationException cve) {
             log.error("Constraint " + cve.getConstraintName() + " is violated, unable to save");
-            throw new EntityAlreadyPresentException(ENTITY_ALREADY_PRESENT_EX_MSG, cve);
+            throw new EntityAlreadyPresentException(ENTITY_ALREADY_PRESENT_EX_MSG, User.class, cve);
         }
 
         return user;
@@ -69,11 +77,11 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void deleteUser(User user) {
+    public void deleteUser(User user) throws NoSuchEntityException {
         Optional<User> existingUser;
         if ( ( existingUser = userRepository.findOne(Example.of(user)) ).isEmpty() ) {
             log.error(NO_SUCH_ENTITY_EX_MSG);
-            return;
+            throw new NoSuchEntityException(NO_SUCH_ENTITY_EX_MSG, User.class);
         }
         user = existingUser.get();
         userRepository.delete(user);
@@ -81,7 +89,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUser(Long id) throws NoSuchEntityException {
         User user = new User();
         user.setId(id);
         deleteUser(user);
@@ -89,35 +97,79 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void editUser(User updatedUser, User existingUser) {
+    public void editUser(User updatedUser, User existingUser) throws NoSuchEntityException {
         if (isNull(updatedUser)) {
-            log.error("!newUser provided is null!");
-            throw new NullPointerException(NULL_PTR_EX_MSG);
+            log.error("Updated user provided is null");
+            throw new IllegalArgumentException(NULL_PTR_EX_MSG);
         }
         if (isNull(existingUser)) {
-            log.error("!oldUser provided is null!");
-            throw new NullPointerException(NULL_PTR_EX_MSG);
+            log.error("Existing user provided is null");
+            throw new IllegalArgumentException(NULL_PTR_EX_MSG);
         }
         Optional<User> existingUserOpt;
         if ( ( existingUserOpt = userRepository.findOne(Example.of(existingUser)) ).isEmpty() ) {
-            log.error("!No such user found!");
-            throw new NoSuchEntityException(NO_SUCH_ENTITY_EX_MSG);
+            log.error(NO_SUCH_ENTITY_EX_MSG);
+            throw new NoSuchEntityException(NO_SUCH_ENTITY_EX_MSG, User.class);
         }
         if (existingUserOpt.get().isDeleted()) {
-            log.warn("!User being edited is marked as deleted!");
+            log.warn("User being edited is marked as deleted!");
         }
         updateUser(updatedUser, existingUserOpt.get());
     }
 
     @Override
-    public void editUser(User updatedUser, Long id) {
+    public void editUser(User updatedUser, Long id) throws NoSuchEntityException {
         if (isNull(id) || id <= 0) {
-            log.error("!Invalid id provided!");
+            log.error("Invalid id provided!");
             throw new IllegalArgumentException(INVALID_ID_PROVIDED_EX_MSG);
         }
         User existingUser = new User();
         existingUser.setId(id);
         editUser(updatedUser, existingUser);
+    }
+
+    @Transactional
+    @Override
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+        Optional<User> userOpt;
+        if (isNull(login) || login.isBlank()) {
+            throw new IllegalArgumentException(NULL_OR_EMPTY_LOGIN_EX_MSG);
+        }
+        if (login.matches(IS_EMAIL_REGEX)) {
+            userOpt = userRepository.findByEmail(login);
+        }
+        else {
+            userOpt = userRepository.findByPhoneNumber(login);
+        }
+        if (userOpt.isEmpty()) {
+            throw new UsernameNotFoundException(NO_SUCH_ENTITY_EX_MSG + " with username = " + login);
+        }
+
+        return userOpt.get();
+    }
+
+    @Transactional
+    @Override
+    public void changePassword(User user, String rawPassword) throws NoSuchEntityException {
+        Optional<User> userOpt;
+        if (isNull(rawPassword) || rawPassword.isBlank()) {
+            throw new IllegalArgumentException(NULL_OR_EMPTY_PASSWORD_PROVIDED_EX_MSG);
+        }
+        if ( ( userOpt = userRepository.findOne(Example.of(user)) ).isEmpty() ) {
+            log.error("!No such user found!");
+            throw new NoSuchEntityException(NO_SUCH_ENTITY_EX_MSG, User.class);
+        }
+        User existingUser = userOpt.get();
+        existingUser.setPassword(encoder.encode(rawPassword));
+
+        userRepository.save(existingUser);
+    }
+
+    @Override
+    public void changePassword(Long id, String rawPassword) throws NoSuchEntityException {
+        changePassword(User.builder()
+                .id(id)
+                .build(), rawPassword);
     }
 
     @Override
@@ -126,7 +178,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAll(Boolean isDeleted) { //TODO log refactor
+    public List<User> findAll(Boolean isDeleted) {
         if (isNull(isDeleted)) {
             log.warn("Boolean provided is null, setting it to TRUE!");
             isDeleted = Boolean.TRUE;
@@ -208,7 +260,9 @@ public class UserServiceImpl implements UserService {
             return List.of();
         }
 
-        return userRepository.findByType(type);
+        return userRepository.findByRoleIsIn(stream(UserRole.values())
+                .filter(role -> role.getType().equals(type))
+                .collect(toList()));
     }
 
     @Override
@@ -248,12 +302,10 @@ public class UserServiceImpl implements UserService {
         existingUser.setBirthDate(getValue(updatedUser.getBirthDate(), existingUser.getBirthDate()));
         existingUser.setPhoneNumber(getValue(updatedUser.getPhoneNumber(), existingUser.getPhoneNumber()));
         existingUser.setEmail(getValue(updatedUser.getEmail(), existingUser.getEmail()));
-        existingUser.setType(getValue(updatedUser.getType(), existingUser.getType()));
         existingUser.setRole(getValue(updatedUser.getRole(), existingUser.getRole()));
         existingUser.setLastModified(now());
 
         userRepository.save(existingUser);
-        log.info("User with id=" + existingUser.getId() + " updated.");
     }
 
     private <T> T getValue(T newValue, T oldValue) {
