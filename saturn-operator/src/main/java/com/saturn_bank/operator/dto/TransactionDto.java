@@ -16,4 +16,5 @@ public class TransactionDto {
     private BigDecimal amount;
     private String purpose;
     private TransactionType type;
+    private boolean isWithCurrencyConverting;
 }
