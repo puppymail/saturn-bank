@@ -13,8 +13,8 @@ import java.util.List;
 @Component
 public class CourseClient {
 
-    public static final String DATE_STRING = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/uuuu"));
-    public static final String URL = "https://cbr.ru/scripts/XML_daily.asp?date_req=" + DATE_STRING + ".xml";
+    public static String DATE_STRING = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/uuuu"));
+    public static String URL = "https://cbr.ru/scripts/XML_daily.asp?date_req=" + DATE_STRING + ".xml";
 
     final RestTemplate restTemplate = new RestTemplate();
 

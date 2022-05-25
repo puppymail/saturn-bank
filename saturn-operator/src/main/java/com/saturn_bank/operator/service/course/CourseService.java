@@ -5,11 +5,14 @@ import com.saturn_bank.operator.repository.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,5 +53,13 @@ public class CourseService {
     @PreDestroy
     public void clearCourses() {
         courseRepository.deleteAll();
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void updateCourses() {
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/uuuu"));
+        CourseClient.URL = "https://cbr.ru/scripts/XML_daily.asp?date_req=" + todayDate + ".xml";
+        clearCourses();
+        populateDBCourseInfo();
     }
 }
