@@ -39,6 +39,7 @@ public class CourseService {
 
     @PostConstruct
     public List<Course> populateDBCourseInfo(){
+        List<Course> courses = courseClient.getCourses();
         Course rubCourse = new Course();
         rubCourse.setNumCode(environment.getProperty(NUM_CODE));
         rubCourse.setCharCode(environment.getProperty(CHAR_CODE));
@@ -46,8 +47,8 @@ public class CourseService {
         rubCourse.setName(environment.getProperty(NAME));
         rubCourse.setValue(BigDecimal.valueOf(Long.parseLong(Objects.requireNonNull(environment.getProperty(VALUE)))));
         rubCourse.set_Value(environment.getProperty(VALUE));
-        courseRepository.save(rubCourse);
-        return courseRepository.saveAll(courseClient.getCourses());
+        courses.add(rubCourse);
+        return courseRepository.saveAll(courses);
     }
 
     @PreDestroy
