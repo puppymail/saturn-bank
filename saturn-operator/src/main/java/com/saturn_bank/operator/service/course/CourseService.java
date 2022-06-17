@@ -5,8 +5,10 @@ import com.saturn_bank.operator.repository.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -37,9 +39,7 @@ public class CourseService {
         this.courseClient = courseClient;
     }
 
-    @PostConstruct
-    public List<Course> populateDBCourseInfo(){
-        List<Course> courses = courseClient.getCourses();
+    public void addRubCourse() {
         Course rubCourse = new Course();
         rubCourse.setNumCode(environment.getProperty(NUM_CODE));
         rubCourse.setCharCode(environment.getProperty(CHAR_CODE));
@@ -47,13 +47,19 @@ public class CourseService {
         rubCourse.setName(environment.getProperty(NAME));
         rubCourse.setValue(BigDecimal.valueOf(Long.parseLong(Objects.requireNonNull(environment.getProperty(VALUE)))));
         rubCourse.set_Value(environment.getProperty(VALUE));
-        courses.add(rubCourse);
+        courseRepository.save(rubCourse);
+    }
+
+    @PostConstruct
+    public List<Course> populateDBCourseInfo() {
+        addRubCourse();
+        List<Course> courses = courseClient.getCourses();
         return courseRepository.saveAll(courses);
     }
 
     @PreDestroy
     public void clearCourses() {
-        courseRepository.deleteAll();
+        courseRepository.truncateAndRestartIdentity();
     }
 
     @Scheduled(cron = "0 0 0 * * *")
@@ -63,4 +69,6 @@ public class CourseService {
         clearCourses();
         populateDBCourseInfo();
     }
+
+
 }
