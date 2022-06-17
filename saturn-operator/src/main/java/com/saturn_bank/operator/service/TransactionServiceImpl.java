@@ -19,11 +19,13 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final AccountRepository accountRepo;
     private final TransactionRepository transactionRepo;
+    private final CurrencyConverter currencyConverter;
 
     @Autowired
-    public TransactionServiceImpl(AccountRepository accountRepo, TransactionRepository transactionRepo) {
+    public TransactionServiceImpl(AccountRepository accountRepo, TransactionRepository transactionRepo, CurrencyConverter currencyConverter) {
         this.accountRepo = accountRepo;
         this.transactionRepo = transactionRepo;
+        this.currencyConverter = currencyConverter;
     }
 
     @Override
@@ -46,12 +48,14 @@ public class TransactionServiceImpl implements TransactionService {
             result.append("No such dst account in DB, ");
         }
         if (accountSrc != null && accountDst != null) {
+            String accountSrcCurrencyCoin = accountSrc.getCoin().code;
+            String accountDstCurrencyCoin = accountDst.getCoin().code;
+            BigDecimal convertedAmount = currencyConverter.convert(accountSrcCurrencyCoin, accountDstCurrencyCoin, amount);
+            System.out.println("Source amount in " + accountSrc.getCoin() + amount + " = " + convertedAmount + " in " + accountDst.getCoin());
+
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
                 transaction.setState(TransactionState.ERROR);
                 result.append("Amount can't be negative or zero, ");
-            } else if (accountSrc.getCoin() != accountDst.getCoin()) {
-                transaction.setState(TransactionState.CANCELLED);
-                result.append("Src account and dst account have incompatible currency types, ");
             } else if (type != TransactionType.DEPOSIT && accountSrcNumber.equals(accountDstNumber)) {
                 transaction.setState(TransactionState.CANCELLED);
                 result.append("Src account and dst accounts are same");
@@ -64,11 +68,15 @@ public class TransactionServiceImpl implements TransactionService {
                     accountRepo.save(accountSrc);
                 }
                 if (type != TransactionType.WITHDRAW) {
-                    accountDst.setAmount(accountDst.getAmount().add(amount));
+                    accountDst.setAmount(accountDst.getAmount().add(convertedAmount));
                     accountRepo.save(accountDst);
                 }
                 transaction.setState(TransactionState.DONE);
                 result.append("Transaction completed successfully, ");
+            }
+            if (accountSrc.getCoin() != accountDst.getCoin()) {
+                transaction.setWithCurrencyConverting(Boolean.TRUE);
+                result.append("This transaction is with currency converting, ");
             }
         }
         transaction.setSrc(accountSrcNumber);

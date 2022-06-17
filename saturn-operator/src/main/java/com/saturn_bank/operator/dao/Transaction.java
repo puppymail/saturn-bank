@@ -47,4 +47,7 @@ public class Transaction {
     @Enumerated
     private TransactionType type;
 
+    @Column(name = "is_with_currency_converting")
+    private boolean isWithCurrencyConverting;
+
 }
